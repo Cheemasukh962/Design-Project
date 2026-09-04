@@ -28,7 +28,7 @@ export default function Q2Route() {
   const count = selected.length;
 
   return (
-    <Screen background="cream">
+    <Screen>
       <QuizHeader current={2} total={TOTAL_STEPS} onBack={() => router.back()} />
 
       <ScrollView
@@ -114,6 +114,6 @@ const styles = StyleSheet.create({
   footer: {
     paddingTop: spacing.base * 3,
     paddingBottom: spacing.stackSm,
-    backgroundColor: colors.cream,
+    backgroundColor: colors.surface,
   },
 });

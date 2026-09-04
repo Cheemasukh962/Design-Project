@@ -19,7 +19,7 @@ import { colors, spacing, typography } from '../theme';
  */
 export default function SplashRoute() {
   return (
-    <Screen background="cream">
+    <Screen>
       {/* Mascot occupies the top ~45% and is the first thing to move. */}
       <View style={styles.mascotArea}>
         <VitoMascot pose="idle" size={200} float />

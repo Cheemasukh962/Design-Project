@@ -27,7 +27,7 @@ export default function Q1Route() {
   const selected = answers.eating ?? null;
 
   return (
-    <Screen background="cream">
+    <Screen>
       <QuizHeader current={1} total={TOTAL_STEPS} onBack={() => router.back()} />
 
       <ScrollView

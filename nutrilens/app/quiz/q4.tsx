@@ -24,7 +24,7 @@ export default function Q4Route() {
   const selected = answers.produce ?? null;
 
   return (
-    <Screen background="cream">
+    <Screen>
       <QuizHeader current={4} total={TOTAL_STEPS} onBack={() => router.back()} />
 
       <ScrollView contentContainerStyle={styles.body} showsVerticalScrollIndicator={false}>
@@ -74,6 +74,6 @@ const styles = StyleSheet.create({
   footer: {
     paddingTop: spacing.base * 3,
     paddingBottom: spacing.stackSm,
-    backgroundColor: colors.cream,
+    backgroundColor: colors.surface,
   },
 });

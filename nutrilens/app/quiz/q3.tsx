@@ -13,7 +13,7 @@ import { colors, spacing, typography } from '../../theme';
 /**
  * Quiz question 3 — daylight exposure. Single select.
  *
- * No Stitch mock exists for this screen. It follows Q2's chrome — cream ground,
+ * No Stitch mock exists for this screen. It follows Q2's chrome — the
  * five-dot stepper, mascot chip, 52px CTA — and Q1's single-select rows, since
  * the round radio marker is what distinguishes "one of these" from Q2's square
  * multi-select checkboxes.
@@ -26,7 +26,7 @@ export default function Q3Route() {
   const selected = answers.outside ?? null;
 
   return (
-    <Screen background="cream">
+    <Screen>
       <QuizHeader current={3} total={TOTAL_STEPS} onBack={() => router.back()} />
 
       <ScrollView contentContainerStyle={styles.body} showsVerticalScrollIndicator={false}>
@@ -78,6 +78,6 @@ const styles = StyleSheet.create({
   footer: {
     paddingTop: spacing.base * 3,
     paddingBottom: spacing.stackSm,
-    backgroundColor: colors.cream,
+    backgroundColor: colors.surface,
   },
 });

@@ -15,7 +15,7 @@ type Props = {
  * The dot-separated legal/help row.
  *
  * Per the PRD this is not fine print: it stays fully legible (13px at 70%
- * opacity on cream clears 4.5:1) and every item is a real 44pt touch target.
+ * opacity on the page ground clears 4.5:1) and every item is a real 44pt touch target.
  */
 export function FooterLinks({ links }: Props) {
   return (

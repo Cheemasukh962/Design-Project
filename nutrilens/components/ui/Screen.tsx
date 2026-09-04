@@ -7,17 +7,18 @@ import { companion } from '../../theme/companion';
 /**
  * The two page grounds used across the mocks.
  *
- * `cream` is the onboarding ground — splash and the quiz. `surface` is the
- * app proper: results, home, nutrient detail and the routine tracker all sit
- * on #f8f9ff. Keeping the split means the quiz reads as a distinct, finite
- * errand and arriving at results feels like entering the actual product.
+ * `surface` (#f8f9ff) is the whole health app — splash, quiz, results, Home,
+ * nutrient pages and the tracker. There used to be a second, warmer cream
+ * ground for onboarding, on the theory that it made the quiz read as its own
+ * finite errand. In practice it just made the app look like it changed its mind
+ * halfway through, so it is gone: one light ground, everywhere.
  *
- * `night` is the companion world. It exists to contain the three elemental
- * hues: on the dark ground colour means creature type, and on the light
- * grounds colour means what it means everywhere else in the health app. The
- * two never share a surface. See theme/companion.ts.
+ * `night` is the companion world, and it is the only other ground. It exists to
+ * contain the three elemental hues: on the dark ground colour means creature
+ * type, and on the light ground colour means what it means everywhere else in
+ * the health app. The two never share a surface. See theme/companion.ts.
  */
-export type ScreenBackground = 'cream' | 'surface' | 'night';
+export type ScreenBackground = 'surface' | 'night';
 
 type Props = {
   children: ReactNode;
@@ -66,7 +67,6 @@ export function Screen({
 }
 
 const GROUNDS: Record<ScreenBackground, string> = {
-  cream: colors.cream,
   surface: colors.surface,
   night: companion.night,
 };

@@ -120,7 +120,7 @@ export function VitoMascot({
 const styles = StyleSheet.create({
   image: {
     // The source render ships on a white ground rather than transparent, so it
-    // reads as a faint square on the cream page. Replace with a cut-out PNG.
+    // reads as a faint square on the page ground. Replace with a cut-out PNG.
     backgroundColor: 'transparent',
   },
 });

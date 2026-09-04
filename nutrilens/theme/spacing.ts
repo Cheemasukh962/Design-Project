@@ -27,7 +27,7 @@ export const spacing = {
  * neutral gray. RN needs both the iOS shadow* props and the Android elevation.
  */
 export const elevation = {
-  /** Flat. Separation comes from the cream page behind a white surface. */
+  /** Flat. Separation comes from the page ground behind a white card. */
   e0: {},
   /** Standard interactive card. */
   e1: {

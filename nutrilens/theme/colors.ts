@@ -49,7 +49,16 @@ export const colors = {
   onTertiaryFixedVariant: '#474742',
 
   // ---- Surfaces ----
-  /** Page background. The mocks override the M3 `surface` token with cream. */
+  /**
+   * RETIRED as a page ground. The splash and quiz used to sit on this warm
+   * cream while the rest of the app sat on `surface`, and the switch partway
+   * through read as the app changing its mind rather than as a deliberate
+   * shift. Everything is on `surface` now.
+   *
+   * Kept because it is a real brand value and may still be wanted for an
+   * illustration or a print asset — but nothing should set it as a page
+   * background again without also moving every other screen.
+   */
   cream: '#FAF7F0',
   surface: '#f8f9ff',
   surfaceDim: '#d3dbe7',

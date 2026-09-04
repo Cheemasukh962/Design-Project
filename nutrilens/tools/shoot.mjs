@@ -47,10 +47,13 @@ await new Promise((r) => setTimeout(r, Number(waitMs)));
 // selected / filled state can be photographed rather than only the empty one.
 for (const label of clicks.split(',').map((s) => s.trim()).filter(Boolean)) {
   const hit = await page.evaluate((text) => {
-    const nodes = [...document.querySelectorAll('div,span,button')];
-    const el = nodes.reverse().find(
-      (n) => n.textContent?.trim() === text && n.getClientRects().length,
-    );
+    const nodes = [...document.querySelectorAll('div,span,button,a')];
+    // Match visible text first, then aria-label — icon-only controls (carousel
+    // arrows, icon buttons) carry no text at all and were silently unclickable.
+    const visible = (n) => n.getClientRects().length > 0;
+    const el =
+      nodes.reverse().find((n) => n.textContent?.trim() === text && visible(n)) ??
+      nodes.find((n) => n.getAttribute('aria-label') === text && visible(n));
     if (!el) return false;
     const target = el.closest('[tabindex],[role],div');
     target.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true }));

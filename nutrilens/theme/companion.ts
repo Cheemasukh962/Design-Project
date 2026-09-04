@@ -1,8 +1,8 @@
 /**
  * The companion world's palette.
  *
- * CONTAINMENT IS THE WHOLE IDEA. The nutrition app is light — cream and
- * #f8f9ff — and carries a strict colour language: gold means "worth a look",
+ * CONTAINMENT IS THE WHOLE IDEA. The nutrition app is light — #f8f9ff
+ * throughout — and carries a strict colour language: gold means "worth a look",
  * green means "done", red is banned outright. Dropping three saturated
  * elemental hues into that would wreck it: an orange creature next to a gold
  * insight card makes the reader ask which orange means what.

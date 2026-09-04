@@ -13,13 +13,22 @@ npx expo start          # QR code for Expo Go, or press w for browser
 ## Flow
 
 ```
-/                 Splash                                      cream
-/quiz/q1 … q5     The five questions                           cream
-/results          Findings, with the reason behind each        surface
-/nutrient/[id]    Reference page — d, b12, c, iron, calcium    surface
+/                 Splash
+/quiz/q1 … q5     The five questions
+/starter          Pick your pal          (first run only, inside the quiz flow)
+/results          Findings, with the reason behind each
+/nutrient/[id]    Reference page — d, b12, c, iron, calcium
+/companion        Your pal, full screen
+/creatures        Design reference sheet — all nine forms, not in the flow
 
 [ Home | Discover | Routine | Profile ]   bottom nav, four tabs
 ```
+
+**Picking a pal sits between the last question and the results.** Arriving at
+your findings and *then* being asked to choose a mascot reads as an
+interruption; choosing first means the pal is already there when the results
+land. Q5's button says "Meet your pal" on a first run and "See my results"
+after, and anyone who already has one skips straight through.
 
 **On a desktop browser the app is locked to a 393x852 phone canvas**
 (`components/ui/DeviceFrame`). Every screen was designed at that width and the
@@ -28,10 +37,14 @@ unreadable lines and puts the bottom nav where nobody would design it. Native
 is a pass-through, and a browser window narrower than the frame fills the
 viewport instead of letterboxing.
 
-**Two page grounds, and the split is deliberate.** Splash and the quiz sit on
-cream (`#FAF7F0`); everything after sits on the app surface (`#f8f9ff`). That is
-what the mocks do, and it earns its keep: the quiz reads as a distinct, finite
-errand and arriving at Results feels like entering the actual product.
+**One light ground: `#f8f9ff`, everywhere.** Splash and the quiz used to sit on
+a warmer cream while the rest of the app sat on the blue-white surface. The
+theory was that it made the quiz read as its own finite errand; in practice the
+app looked like it changed its mind partway through. `colors.cream` is still a
+brand value but is retired as a page background.
+
+**The one other ground is the companion's deep navy**, and that split is load
+bearing rather than decorative — see the companion section below.
 
 The nav bar is custom (`components/nav/BottomNav`) because the active tab is a
 filled navy pill wrapping icon and label together, which the default bar cannot
