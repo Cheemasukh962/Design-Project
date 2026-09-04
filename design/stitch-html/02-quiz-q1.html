@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>NutriLens - Onboarding Quiz</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "on-primary-container": "#7490bf",
+                      "tertiary-fixed": "#e5e2db",
+                      "on-tertiary-container": "#908f89",
+                      "on-background": "#141c25",
+                      "on-secondary-fixed": "#261a00",
+                      "on-tertiary-fixed": "#1c1c18",
+                      "on-surface-variant": "#43474f",
+                      "outline-variant": "#c4c6d0",
+                      "tertiary": "#131410",
+                      "primary-fixed": "#d5e3ff",
+                      "inverse-primary": "#abc8fa",
+                      "on-primary-fixed-variant": "#2a4772",
+                      "on-tertiary-fixed-variant": "#474742",
+                      "tertiary-container": "#282824",
+                      "surface-container": "#e7eefc",
+                      "error-container": "#ffdad6",
+                      "surface-container-lowest": "#ffffff",
+                      "on-error": "#ffffff",
+                      "surface-container-highest": "#dbe3f0",
+                      "surface-container-low": "#eef4ff",
+                      "background": "#f8f9ff",
+                      "secondary-fixed-dim": "#fbbc00",
+                      "secondary-container": "#ffbf00",
+                      "on-secondary-container": "#6d5000",
+                      "tertiary-fixed-dim": "#c9c6c0",
+                      "surface-tint": "#435f8b",
+                      "primary-fixed-dim": "#abc8fa",
+                      "inverse-surface": "#29313b",
+                      "inverse-on-surface": "#e9f1fe",
+                      "surface-container-high": "#e1e9f6",
+                      "on-error-container": "#93000a",
+                      "on-secondary-fixed-variant": "#5c4300",
+                      "outline": "#74777f",
+                      "on-primary-fixed": "#001b3c",
+                      "primary-container": "#022851",
+                      "on-surface": "#141c25",
+                      "error": "#ba1a1a",
+                      "surface-bright": "#f8f9ff",
+                      "surface-variant": "#dbe3f0",
+                      "on-primary": "#ffffff",
+                      "surface": "#f8f9ff",
+                      "surface-dim": "#d3dbe7",
+                      "primary": "#00142e",
+                      "secondary": "#795900",
+                      "secondary-fixed": "#ffdfa0",
+                      "on-secondary": "#ffffff",
+                      "on-tertiary": "#ffffff"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "stack-md": "16px",
+                      "card-padding-lg": "20px",
+                      "base": "4px",
+                      "stack-lg": "24px",
+                      "stack-sm": "8px",
+                      "card-padding-sm": "16px",
+                      "margin-screen": "20px"
+              },
+              "fontFamily": {
+                      "h1-mobile": ["Inter"],
+                      "body-lg": ["Inter"],
+                      "display": ["Inter"],
+                      "micro": ["Inter"],
+                      "h3": ["Inter"],
+                      "caption": ["Inter"],
+                      "h2": ["Inter"],
+                      "body-md": ["Inter"],
+                      "h1": ["Inter"]
+              },
+              "fontSize": {
+                      "h1-mobile": ["24px", { "lineHeight": "30px", "fontWeight": "700" }],
+                      "body-lg": ["17px", { "lineHeight": "26px", "fontWeight": "400" }],
+                      "display": ["34px", { "lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                      "micro": ["11px", { "lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600" }],
+                      "h3": ["18px", { "lineHeight": "24px", "fontWeight": "600" }],
+                      "caption": ["13px", { "lineHeight": "18px", "fontWeight": "500" }],
+                      "h2": ["22px", { "lineHeight": "28px", "fontWeight": "600" }],
+                      "body-md": ["15px", { "lineHeight": "22px", "fontWeight": "400" }],
+                      "h1": ["28px", { "lineHeight": "34px", "letterSpacing": "-0.01em", "fontWeight": "700" }]
+              }
+            }
+          }
+        }
+    </script>
+<style>
+        /* Custom styles for interactions */
+        .option-card {
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .option-card.selected {
+            border-color: var(--color-primary);
+            background-color: var(--color-surface-container-low);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background min-h-screen flex flex-col font-body-md text-on-background selection:bg-primary-container selection:text-on-primary-container">
+<!-- Header (Linear flow - TopAppBar suppressed, custom quiz header used) -->
+<header class="flex justify-between items-center px-margin-screen py-stack-md w-full max-w-2xl mx-auto">
+<button aria-label="Go back" class="w-10 h-10 flex items-center justify-center rounded-full bg-surface-container-lowest border border-outline-variant/50 hover:bg-surface-container-high transition-colors shadow-sm">
+<span class="material-symbols-outlined text-on-surface">arrow_back</span>
+</button>
+<!-- Progress Dots -->
+<div aria-label="Progress: Step 1 of 3" class="flex items-center gap-2">
+<div class="w-2.5 h-2.5 rounded-full bg-primary shadow-sm shadow-primary/20"></div>
+<div class="w-2 h-2 rounded-full bg-outline-variant/60"></div>
+<div class="w-2 h-2 rounded-full bg-outline-variant/60"></div>
+</div>
+<!-- Spacer to balance back button -->
+<div class="w-10 h-10"></div>
+</header>
+<!-- Main Content Area -->
+<main class="flex-1 flex flex-col w-full max-w-xl mx-auto px-margin-screen pt-stack-lg pb-10">
+<!-- Mascot Widget -->
+<div class="inline-flex items-center gap-2 bg-surface-container-low border border-primary/10 px-3 py-1.5 rounded-full mb-stack-lg self-start shadow-[0_2px_8px_rgba(0,20,46,0.03)]">
+<span class="material-symbols-outlined text-[18px] text-primary" style="font-variation-settings: 'FILL' 1;">emoji_people</span>
+<span class="font-caption text-caption text-primary">Let's get to know you</span>
+</div>
+<!-- Question -->
+<h1 class="font-h1 text-h1 md:font-display md:text-display text-on-background mb-8">
+            How do you usually eat?
+        </h1>
+<!-- Options Grid -->
+<div aria-labelledby="question-1" class="flex flex-col gap-stack-md mt-2" role="radiogroup">
+<!-- Option 1 -->
+<button class="option-card flex items-center justify-between p-card-padding-lg bg-surface-container-lowest border border-outline-variant/60 rounded-xl hover:border-primary/50 hover:bg-surface-container-low hover:shadow-md text-left group relative overflow-hidden shadow-[0_2px_4px_rgba(0,20,46,0.02)] w-full focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-background">
+<span class="font-h3 text-h3 text-on-surface group-hover:text-primary transition-colors">Mostly quick and packaged</span>
+<div class="w-6 h-6 rounded-full border-2 border-outline-variant/60 group-hover:border-primary/50 flex items-center justify-center transition-colors"></div>
+</button>
+<!-- Option 2 (Mocked as Selected for visual reference) -->
+<button class="option-card flex items-center justify-between p-card-padding-lg bg-surface-container-low border-2 border-primary rounded-xl text-left group relative overflow-hidden shadow-[0_4px_12px_rgba(0,20,46,0.06)] w-full focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-background">
+<span class="font-h3 text-h3 text-primary">Dining hall most days</span>
+<div class="w-6 h-6 rounded-full border-2 border-primary bg-primary flex items-center justify-center transition-colors">
+<span class="material-symbols-outlined text-on-primary text-[14px]" style="font-variation-settings: 'wght' 600;">check</span>
+</div>
+</button>
+<!-- Option 3 -->
+<button class="option-card flex items-center justify-between p-card-padding-lg bg-surface-container-lowest border border-outline-variant/60 rounded-xl hover:border-primary/50 hover:bg-surface-container-low hover:shadow-md text-left group relative overflow-hidden shadow-[0_2px_4px_rgba(0,20,46,0.02)] w-full focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-background">
+<span class="font-h3 text-h3 text-on-surface group-hover:text-primary transition-colors">I cook a few times a week</span>
+<div class="w-6 h-6 rounded-full border-2 border-outline-variant/60 group-hover:border-primary/50 flex items-center justify-center transition-colors"></div>
+</button>
+<!-- Option 4 -->
+<button class="option-card flex items-center justify-between p-card-padding-lg bg-surface-container-lowest border border-outline-variant/60 rounded-xl hover:border-primary/50 hover:bg-surface-container-low hover:shadow-md text-left group relative overflow-hidden shadow-[0_2px_4px_rgba(0,20,46,0.02)] w-full focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-background">
+<span class="font-h3 text-h3 text-on-surface group-hover:text-primary transition-colors">Pretty balanced</span>
+<div class="w-6 h-6 rounded-full border-2 border-outline-variant/60 group-hover:border-primary/50 flex items-center justify-center transition-colors"></div>
+</button>
+</div>
+<!-- Sticky Footer Action -->
+<div class="mt-auto pt-8 pb-4">
+<button class="w-full bg-primary text-on-primary font-h3 text-h3 py-4 px-6 rounded-full hover:bg-primary-container hover:text-on-primary-container transition-all flex items-center justify-center gap-2 shadow-[0_4px_14px_rgba(0,20,46,0.2)]">
+                Continue
+                <span class="material-symbols-outlined" style="font-variation-settings: 'wght' 600;">arrow_forward</span>
+</button>
+</div>
+</main>
+<!-- BottomNavBar Suppressed based on Conflict Resolution Protocol (Linear/Transactional intent) -->
+</body></html>

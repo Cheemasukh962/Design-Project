@@ -1,0 +1,206 @@
+<!DOCTYPE html><html class="light" lang="en" style=""><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>NutriLens - Results</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-primary-container": "#7490bf",
+                        "tertiary-fixed": "#e5e2db",
+                        "on-tertiary-container": "#908f89",
+                        "on-background": "#141c25",
+                        "on-secondary-fixed": "#261a00",
+                        "on-tertiary-fixed": "#1c1c18",
+                        "on-surface-variant": "#43474f",
+                        "outline-variant": "#c4c6d0",
+                        "tertiary": "#131410",
+                        "primary-fixed": "#d5e3ff",
+                        "inverse-primary": "#abc8fa",
+                        "on-primary-fixed-variant": "#2a4772",
+                        "on-tertiary-fixed-variant": "#474742",
+                        "tertiary-container": "#282824",
+                        "surface-container": "#e7eefc",
+                        "error-container": "#ffdad6",
+                        "surface-container-lowest": "#ffffff",
+                        "on-error": "#ffffff",
+                        "surface-container-highest": "#dbe3f0",
+                        "surface-container-low": "#eef4ff",
+                        "background": "#f8f9ff",
+                        "secondary-fixed-dim": "#fbbc00",
+                        "secondary-container": "#ffbf00",
+                        "on-secondary-container": "#6d5000",
+                        "tertiary-fixed-dim": "#c9c6c0",
+                        "surface-tint": "#435f8b",
+                        "primary-fixed-dim": "#abc8fa",
+                        "inverse-surface": "#29313b",
+                        "inverse-on-surface": "#e9f1fe",
+                        "surface-container-high": "#e1e9f6",
+                        "on-error-container": "#93000a",
+                        "on-secondary-fixed-variant": "#5c4300",
+                        "outline": "#74777f",
+                        "on-primary-fixed": "#001b3c",
+                        "primary-container": "#022851",
+                        "on-surface": "#141c25",
+                        "error": "#ba1a1a",
+                        "surface-bright": "#f8f9ff",
+                        "surface-variant": "#dbe3f0",
+                        "on-primary": "#ffffff",
+                        "surface": "#f8f9ff",
+                        "surface-dim": "#d3dbe7",
+                        "primary": "#00142e",
+                        "secondary": "#795900",
+                        "secondary-fixed": "#ffdfa0",
+                        "on-secondary": "#ffffff",
+                        "on-tertiary": "#ffffff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "stack-md": "16px",
+                        "card-padding-lg": "20px",
+                        "base": "4px",
+                        "stack-lg": "24px",
+                        "stack-sm": "8px",
+                        "card-padding-sm": "16px",
+                        "margin-screen": "20px"
+                    },
+                    "fontFamily": {
+                        "h1-mobile": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "display": ["Inter"],
+                        "micro": ["Inter"],
+                        "h3": ["Inter"],
+                        "caption": ["Inter"],
+                        "h2": ["Inter"],
+                        "body-md": ["Inter"],
+                        "h1": ["Inter"]
+                    },
+                    "fontSize": {
+                        "h1-mobile": ["24px", { "lineHeight": "30px", "fontWeight": "700" }],
+                        "body-lg": ["17px", { "lineHeight": "26px", "fontWeight": "400" }],
+                        "display": ["34px", { "lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "micro": ["11px", { "lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600" }],
+                        "h3": ["18px", { "lineHeight": "24px", "fontWeight": "600" }],
+                        "caption": ["13px", { "lineHeight": "18px", "fontWeight": "500" }],
+                        "h2": ["22px", { "lineHeight": "28px", "fontWeight": "600" }],
+                        "body-md": ["15px", { "lineHeight": "22px", "fontWeight": "400" }],
+                        "h1": ["28px", { "lineHeight": "34px", "letterSpacing": "-0.01em", "fontWeight": "700" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-background min-h-screen pb-32">
+<!-- TopAppBar -->
+<header class="bg-background flex justify-between items-center w-full px-margin-screen py-stack-sm docked full-width top-0 z-50">
+<div class="flex items-center gap-stack-sm">
+<div class="w-10 h-10 rounded-full bg-surface-container-high overflow-hidden flex items-center justify-center">
+<img class="w-full h-full object-cover" data-alt="A small, stylized illustration of a friendly mascot character, likely a dog or animal, acting as a supportive guide. Modern corporate minimalism style, flat colors, clean lines, set against a light background." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAC6zxVCVcFt3cNj9v3D40h4epv9L7Gnxl_MTTHB-OIzfohWM87Q8R0-yyag8CA-9HyyVVTPJz2EO0SS5t7eArb9OYCoHFYXFQ8fyF1qwoEeDM4AbGHgaxbcPJEowFSEWAXbUbG9was_9mpSnPguDrzStly0XzzEF8JqRUaolEJASI4xH6E2XCMXTta-l1pxYdpf74hqWgyrvIH5xOk4frMTDQaQCxCXg-uIec1NYN66bEK7NksF6mTxg">
+</div>
+<h1 class="font-h1-mobile text-h1-mobile text-primary font-bold">NutriLens</h1>
+</div>
+<button class="w-10 h-10 rounded-full flex items-center justify-center text-on-surface-variant hover:bg-surface-container-low transition-colors duration-200 ease-in-out">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</button>
+</header>
+<main class="max-w-2xl mx-auto px-margin-screen pt-stack-lg">
+<!-- Headline -->
+<h2 class="font-display text-display text-primary mb-stack-lg">Here's what we found</h2>
+<!-- Summary Card -->
+<div class="bg-secondary-fixed rounded-xl p-card-padding-lg mb-stack-lg flex items-start gap-card-padding-sm shadow-[0_4px_12px_rgba(67,95,139,0.06)]">
+<div class="w-12 h-12 rounded-full overflow-hidden shrink-0 border-2 border-surface-container-lowest">
+<img class="w-full h-full object-cover" data-alt="A small, stylized illustration of a friendly mascot character, acting as a supportive guide. Modern corporate minimalism style, flat colors, clean lines, set against a light background." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBa4Qnsha3Cst-XAnz2vDSZ9vswlATdlraANJD18fFGMMvKdOXeas4YOyFDjKjA-W0aCCutrlVqHG2TuR74YhIhOHjKRF1tthw2460k6RhJDJOqOJiLIhmKPKpojkMP3QMeq-4IApfsif2OQSPLBSY-5NXpcMA-b9NIIkU3LGOq6AdtSt9QY5UNiyskDnFZwL2a2IREOnFln2eaijpKOqilaNCgRS9X4090DuyZ6GYWrIEj7dRC1rlA3Q">
+</div>
+<div><p class="font-h3 text-h3 text-on-secondary-fixed mb-base">Based on your answers,</p><p class="font-body-md text-body-md text-on-secondary-fixed opacity-80">These 3 nutrients may be worth your time.</p></div>
+</div>
+<!-- Gap Cards List -->
+<div class="space-y-stack-md mb-stack-lg">
+<!-- Vitamin D -->
+<div class="bg-surface-container-lowest rounded-xl p-card-padding-sm shadow-[0_4px_12px_rgba(67,95,139,0.06)] border border-surface-container">
+<div class="flex justify-between items-start mb-stack-sm">
+<h3 class="font-h2 text-h2 text-primary">Vitamin D</h3>
+
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant mb-stack-sm">Crucial for bone health and immune support.</p>
+<div class="flex flex-wrap gap-2">
+<span class="inline-flex items-center gap-1 bg-surface-container px-2 py-1 rounded-full font-caption text-caption text-on-surface-variant">
+<span class="material-symbols-outlined text-[16px]" data-icon="light_mode">light_mode</span> Sun
+                    </span>
+<span class="inline-flex items-center gap-1 bg-surface-container px-2 py-1 rounded-full font-caption text-caption text-on-surface-variant">
+<span class="material-symbols-outlined text-[16px]" data-icon="set_meal">set_meal</span> Salmon
+                    </span>
+<span class="inline-flex items-center gap-1 bg-surface-container px-2 py-1 rounded-full font-caption text-caption text-on-surface-variant">
+<span class="material-symbols-outlined text-[16px]" data-icon="egg">egg</span> Eggs
+                    </span>
+</div>
+</div>
+<!-- Vitamin B12 -->
+<div class="bg-surface-container-lowest rounded-xl p-card-padding-sm shadow-[0_4px_12px_rgba(67,95,139,0.06)] border border-surface-container">
+<div class="flex justify-between items-start mb-stack-sm">
+<h3 class="font-h2 text-h2 text-primary">Vitamin B12</h3>
+
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant mb-stack-sm">Important for nerve function and energy production.</p>
+<div class="flex flex-wrap gap-2">
+<span class="inline-flex items-center gap-1 bg-surface-container px-2 py-1 rounded-full font-caption text-caption text-on-surface-variant">
+<span class="material-symbols-outlined text-[16px]" data-icon="egg">egg</span> Eggs
+                    </span>
+<span class="inline-flex items-center gap-1 bg-surface-container px-2 py-1 rounded-full font-caption text-caption text-on-surface-variant">
+<span class="material-symbols-outlined text-[16px]" data-icon="water_drop">water_drop</span> Dairy
+                    </span>
+<span class="inline-flex items-center gap-1 bg-surface-container px-2 py-1 rounded-full font-caption text-caption text-on-surface-variant">
+<span class="material-symbols-outlined text-[16px]" data-icon="bakery_dining">bakery_dining</span> Fortified Foods
+                    </span>
+</div>
+</div>
+<!-- Vitamin C -->
+<div class="bg-surface-container-lowest rounded-xl p-card-padding-sm shadow-[0_4px_12px_rgba(67,95,139,0.06)] border border-surface-container">
+<div class="flex justify-between items-start mb-stack-sm">
+<h3 class="font-h2 text-h2 text-primary">Vitamin C</h3>
+
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant mb-stack-sm">A powerful antioxidant that aids in healing.</p>
+<div class="flex flex-wrap gap-2">
+<span class="inline-flex items-center gap-1 bg-surface-container px-2 py-1 rounded-full font-caption text-caption text-on-surface-variant">
+<span class="material-symbols-outlined text-[16px]" data-icon="nutrition">nutrition</span> Citrus
+                    </span>
+<span class="inline-flex items-center gap-1 bg-surface-container px-2 py-1 rounded-full font-caption text-caption text-on-surface-variant">
+<span class="material-symbols-outlined text-[16px]" data-icon="eco">eco</span> Greens
+                    </span>
+</div>
+</div>
+</div>
+<!-- Actions -->
+<div class="flex flex-col gap-stack-md mb-stack-lg">
+<button class="w-full bg-primary text-on-primary py-3 px-6 rounded-full font-h3 text-h3 hover:bg-primary-container transition-colors shadow-md">
+                Add these to my routine
+            </button>
+<button class="w-full bg-transparent border-2 border-outline-variant text-on-surface-variant py-3 px-6 rounded-full font-h3 text-h3 hover:bg-surface-container transition-colors">
+                Go to home
+            </button>
+</div>
+<!-- Disclaimer -->
+<p class="font-body-md text-body-md text-on-surface-variant text-center opacity-70 pb-stack-lg">
+            This is an estimate from 3 questions. Talk to a doctor for personalized medical advice.
+        </p>
+</main>
+
+
+</body></html>

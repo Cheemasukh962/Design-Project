@@ -1,0 +1,274 @@
+<!DOCTYPE html><html class="light" lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Vitamin D Reference - NutriLens</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "secondary": "#795900",
+                        "surface-bright": "#f8f9ff",
+                        "tertiary-fixed-dim": "#c9c6c0",
+                        "error-container": "#ffdad6",
+                        "primary-container": "#022851",
+                        "tertiary": "#131410",
+                        "on-secondary-fixed": "#261a00",
+                        "on-secondary-fixed-variant": "#5c4300",
+                        "on-primary-fixed": "#001b3c",
+                        "outline": "#74777f",
+                        "on-tertiary-fixed-variant": "#474742",
+                        "on-error": "#ffffff",
+                        "on-primary-fixed-variant": "#2a4772",
+                        "secondary-container": "#ffbf00",
+                        "on-surface-variant": "#43474f",
+                        "primary-fixed": "#d5e3ff",
+                        "surface": "#f8f9ff",
+                        "error": "#ba1a1a",
+                        "surface-variant": "#dbe3f0",
+                        "primary-fixed-dim": "#abc8fa",
+                        "outline-variant": "#c4c6d0",
+                        "on-tertiary-container": "#908f89",
+                        "on-secondary-container": "#6d5000",
+                        "surface-container": "#e7eefc",
+                        "on-primary-container": "#7490bf",
+                        "on-error-container": "#93000a",
+                        "inverse-surface": "#29313b",
+                        "on-secondary": "#ffffff",
+                        "on-surface": "#141c25",
+                        "secondary-fixed": "#ffdfa0",
+                        "surface-tint": "#435f8b",
+                        "surface-container-highest": "#dbe3f0",
+                        "on-background": "#141c25",
+                        "on-primary": "#ffffff",
+                        "surface-container-lowest": "#ffffff",
+                        "secondary-fixed-dim": "#fbbc00",
+                        "on-tertiary-fixed": "#1c1c18",
+                        "surface-container-low": "#eef4ff",
+                        "on-tertiary": "#ffffff",
+                        "inverse-on-surface": "#e9f1fe",
+                        "tertiary-container": "#282824",
+                        "tertiary-fixed": "#e5e2db",
+                        "surface-dim": "#d3dbe7",
+                        "surface-container-high": "#e1e9f6",
+                        "inverse-primary": "#abc8fa",
+                        "primary": "#00142e",
+                        "background": "#f8f9ff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "base": "4px",
+                        "stack-md": "16px",
+                        "card-padding-sm": "16px",
+                        "stack-lg": "24px",
+                        "margin-screen": "20px",
+                        "stack-sm": "8px",
+                        "card-padding-lg": "20px"
+                    },
+                    "fontFamily": {
+                        "body-md": ["Inter"],
+                        "caption": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "h2": ["Inter"],
+                        "h1": ["Inter"],
+                        "h3": ["Inter"],
+                        "display": ["Inter"],
+                        "h1-mobile": ["Inter"],
+                        "micro": ["Inter"]
+                    },
+                    "fontSize": {
+                        "body-md": ["15px", { "lineHeight": "22px", "fontWeight": "400" }],
+                        "caption": ["13px", { "lineHeight": "18px", "fontWeight": "500" }],
+                        "body-lg": ["17px", { "lineHeight": "26px", "fontWeight": "400" }],
+                        "h2": ["22px", { "lineHeight": "28px", "fontWeight": "600" }],
+                        "h1": ["28px", { "lineHeight": "34px", "letterSpacing": "-0.01em", "fontWeight": "700" }],
+                        "h3": ["18px", { "lineHeight": "24px", "fontWeight": "600" }],
+                        "display": ["34px", { "lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "h1-mobile": ["24px", { "lineHeight": "30px", "fontWeight": "700" }],
+                        "micro": ["11px", { "lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        .bg-opacity-8 {
+            background-color: rgba(2, 40, 81, 0.08); /* primary-container approx */
+        }
+        .shadow-e1 {
+            box-shadow: 0 4px 6px -1px rgba(2, 40, 81, 0.06), 0 2px 4px -1px rgba(2, 40, 81, 0.04);
+        }
+        .shadow-e2 {
+            box-shadow: 0 10px 15px -3px rgba(2, 40, 81, 0.1), 0 4px 6px -2px rgba(2, 40, 81, 0.05);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+</head>
+<body class="bg-background text-on-background font-body-md antialiased min-h-screen flex flex-col items-center">
+<div class="w-full max-w-2xl bg-surface-bright min-h-screen relative shadow-e2 flex flex-col">
+<!-- TopAppBar -->
+<header class="flex justify-between items-center w-full px-margin-screen py-stack-sm bg-surface-bright sticky top-0 z-10">
+<button class="p-2 -ml-2 rounded-full hover:bg-surface-container-low transition-colors text-primary flex items-center justify-center">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">arrow_back</span>
+</button>
+<h1 class="font-h2 text-h2 font-bold text-primary">Vitamin D</h1>
+<button class="p-2 -mr-2 rounded-full hover:bg-surface-container-low transition-colors text-primary flex items-center justify-center">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">favorite_border</span>
+</button>
+</header>
+<main class="flex-1 overflow-y-auto pb-[100px]"> <!-- padding for sticky CTA -->
+<div class="px-margin-screen flex flex-col gap-stack-lg py-stack-lg">
+<!-- Hero Section -->
+<section class="bg-surface-container-low/70 border border-outline-variant/20 rounded-xl p-4 sm:p-card-padding-lg shadow-e1 relative overflow-hidden flex flex-col md:flex-row gap-4 items-center">
+<div class="flex-1 w-full z-10">
+<h2 class="font-h3 text-h3 text-primary mb-3">Essential for</h2>
+<div class="grid grid-cols-2 gap-2.5"><div class="flex items-center gap-2 bg-surface-bright/80 px-2.5 py-2 rounded-lg border border-outline-variant/10"><span class="material-symbols-outlined text-surface-tint text-[20px] shrink-0" style="font-variation-settings: 'FILL' 1;">check_circle</span><span class="font-body-md text-body-md text-on-surface font-medium leading-tight">Bone strength</span></div><div class="flex items-center gap-2 bg-surface-bright/80 px-2.5 py-2 rounded-lg border border-outline-variant/10"><span class="material-symbols-outlined text-surface-tint text-[20px] shrink-0" style="font-variation-settings: 'FILL' 1;">check_circle</span><span class="font-body-md text-body-md text-on-surface font-medium leading-tight">Immune function</span></div><div class="flex items-center gap-2 bg-surface-bright/80 px-2.5 py-2 rounded-lg border border-outline-variant/10"><span class="material-symbols-outlined text-surface-tint text-[20px] shrink-0" style="font-variation-settings: 'FILL' 1;">check_circle</span><span class="font-body-md text-body-md text-on-surface font-medium leading-tight">Mood and energy</span></div><div class="flex items-center gap-2 bg-surface-bright/80 px-2.5 py-2 rounded-lg border border-outline-variant/10"><span class="material-symbols-outlined text-surface-tint text-[20px] shrink-0" style="font-variation-settings: 'FILL' 1;">check_circle</span><span class="font-body-md text-body-md text-on-surface font-medium leading-tight">Muscle recovery</span></div></div>
+</div>
+<div class="w-full md:w-44 h-32 md:h-32 rounded-lg overflow-hidden shrink-0 relative z-10 shadow-e1">
+<img class="w-full h-full object-cover" data-alt="Rich sources of Vitamin D including salmon fillet, glass of milk, and eggs arranged on a wooden board" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBrck77RwXX8hfjgJx5lA5p1gl73qGuqx127d2Z9uh5zAb__erVDw-vLuTLFY18YJjOybHCG9NWKFHtzJiYQYGirav11ycMf9ApeV2rGdlKFYYiat5pC17zDfk3MMXtmoxZvHbdup9tnUuYtHp1jCHRBMtfxr8S1-YGcwrMg1gxPuGPtd180k8tQOsDra9PAMXYJWyNMvhCdk9_n6ay3IRLrs_IMeW3MjNbGNvsL_ESbjzQBY7f8iYppA">
+</div>
+<div class="absolute -bottom-10 -right-10 opacity-5 w-48 h-48 bg-primary rounded-full blur-3xl pointer-events-none"></div>
+</section>
+<!-- What it does (Collapsible Accordion) -->
+<section>
+<div class="flex items-baseline justify-between mb-stack-sm">
+<h3 class="font-h3 text-h3 text-primary">Where to find it</h3>
+<span class="font-caption text-caption text-outline">Everyday sources</span>
+</div>
+<div class="flex overflow-x-auto gap-3 snap-x hide-scrollbar pb-2 -mx-margin-screen px-margin-screen">
+<div class="snap-start shrink-0 w-44 bg-surface-container-low rounded-xl p-3.5 border border-outline-variant/20 shadow-e1 flex flex-col justify-between">
+<div class="flex items-center justify-between mb-3">
+<div class="w-10 h-10 rounded-lg bg-surface-container flex items-center justify-center text-surface-tint shrink-0">
+<span class="material-symbols-outlined text-[22px]">set_meal</span>
+</div>
+<span class="font-caption text-caption font-semibold text-primary bg-primary-fixed/40 px-2 py-0.5 rounded-full">100% DV</span>
+</div>
+<div>
+<div class="font-semibold text-on-surface text-body-md">Wild Salmon</div>
+<div class="text-caption text-outline mt-0.5">1 palm-sized fillet</div>
+</div>
+</div>
+<div class="snap-start shrink-0 w-44 bg-surface-container-low rounded-xl p-3.5 border border-outline-variant/20 shadow-e1 flex flex-col justify-between">
+<div class="flex items-center justify-between mb-3">
+<div class="w-10 h-10 rounded-lg bg-surface-container flex items-center justify-center text-surface-tint shrink-0">
+<span class="material-symbols-outlined text-[22px]">egg</span>
+</div>
+<span class="font-caption text-caption font-semibold text-primary bg-primary-fixed/40 px-2 py-0.5 rounded-full">15% DV</span>
+</div>
+<div>
+<div class="font-semibold text-on-surface text-body-md">Whole Eggs</div>
+<div class="text-caption text-outline mt-0.5">2 large eggs (yolks)</div>
+</div>
+</div>
+<div class="snap-start shrink-0 w-44 bg-surface-container-low rounded-xl p-3.5 border border-outline-variant/20 shadow-e1 flex flex-col justify-between">
+<div class="flex items-center justify-between mb-3">
+<div class="w-10 h-10 rounded-lg bg-surface-container flex items-center justify-center text-surface-tint shrink-0">
+<span class="material-symbols-outlined text-[22px]">water_drop</span>
+</div>
+<span class="font-caption text-caption font-semibold text-primary bg-primary-fixed/40 px-2 py-0.5 rounded-full">20% DV</span>
+</div>
+<div>
+<div class="font-semibold text-on-surface text-body-md">Fortified Milk</div>
+<div class="text-caption text-outline mt-0.5">1 cup dairy/plant milk</div>
+</div>
+</div>
+<div class="snap-start shrink-0 w-44 bg-surface-container-low rounded-xl p-3.5 border border-outline-variant/20 shadow-e1 flex flex-col justify-between">
+<div class="flex items-center justify-between mb-3">
+<div class="w-10 h-10 rounded-lg bg-surface-container flex items-center justify-center text-surface-tint shrink-0">
+<span class="material-symbols-outlined text-[22px]">wb_sunny</span>
+</div>
+<span class="font-caption text-caption font-semibold text-primary bg-primary-fixed/40 px-2 py-0.5 rounded-full">Optimal</span>
+</div>
+<div>
+<div class="font-semibold text-on-surface text-body-md">Midday Sun</div>
+<div class="text-caption text-outline mt-0.5">15–20 mins exposure</div>
+</div>
+</div>
+</div>
+</section><section class="bg-surface-container-low rounded-xl border border-outline-variant/20 shadow-e1 overflow-hidden transition-all">
+<button class="w-full p-card-padding-sm flex items-center justify-between text-left group" onclick="document.getElementById('what-it-does-content').classList.toggle('hidden'); document.getElementById('what-it-does-icon').classList.toggle('rotate-180');">
+<div class="flex items-center gap-2.5">
+<span class="material-symbols-outlined text-surface-tint">biotech</span>
+<h3 class="font-h3 text-h3 text-primary">What it does</h3>
+</div>
+<span class="material-symbols-outlined text-outline group-hover:text-primary transition-transform duration-200" id="what-it-does-icon">expand_more</span>
+</button>
+<div class="px-card-padding-sm pb-card-padding-sm pt-1 border-t border-outline-variant/10 hidden" id="what-it-does-content">
+<p class="font-body-md text-body-md text-on-surface-variant leading-relaxed mb-3">
+                        Vitamin D operates fundamentally like a hormone in your body. It acts as the primary key that unlocks your intestines' ability to absorb calcium and phosphorus—essential minerals needed to construct and preserve strong bone density.
+                    </p>
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-caption">
+<div class="bg-surface-container/60 rounded-lg p-2.5 flex items-start gap-2">
+<span class="material-symbols-outlined text-surface-tint text-[18px] shrink-0 mt-0.5">shield</span>
+<div>
+<div class="font-semibold text-on-surface">Immune Defense</div>
+<div class="text-outline">Regulates white blood cells to fend off seasonal sickness.</div>
+</div>
+</div>
+<div class="bg-surface-container/60 rounded-lg p-2.5 flex items-start gap-2">
+<span class="material-symbols-outlined text-surface-tint text-[18px] shrink-0 mt-0.5">fitness_center</span>
+<div>
+<div class="font-semibold text-on-surface">Bone &amp; Muscle Density</div>
+<div class="text-outline">Prevents stress fractures and sustains muscular power.</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Where to find it -->
+
+<!-- How much you need -->
+<!-- Pro Athlete Performance Insight -->
+<section><div class="bg-primary-container text-on-primary-container rounded-xl p-card-padding-lg relative overflow-hidden shadow-e1"><span class="material-symbols-outlined absolute top-3 right-3 opacity-10 text-5xl text-white">format_quote</span><div class="flex items-center gap-2 mb-3"><span class="material-symbols-outlined text-primary-fixed text-[18px]">insights</span><span class="text-caption font-semibold tracking-wider uppercase text-primary-fixed">Athlete Perspective</span></div><p class="font-body-md text-body-md italic mb-4 relative z-10 text-surface-bright/95 leading-relaxed">"During long winter training blocks and indoor court sessions, keeping my Vitamin D optimal keeps bone stress injuries away, speeds up recovery, and prevents mid-season stamina crashes."</p><div class="flex items-center gap-3 relative z-10"><div class="w-11 h-11 rounded-full bg-surface-container-high ring-2 ring-primary-fixed/20 overflow-hidden shrink-0"><img class="w-full h-full object-cover" data-alt="Portrait of Marcus Vance, athlete" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB8xjjQsStTMyrkVCKulrn6tZ5-etJkZHLWRmlnlbuv_6ou3vgF5ge3pyRRdECuPX1AIvj54IDduxDkpHs9UvJL8rNHcBUKFElzzrhVJ3gK0RJ68SkeWv_641Jhp848XsF94Z0XSs8dTPMIkwxlYVGeAb91NUzvcjDoon-NWJhG5ObNCbEqtfgVbFaNbOHwJXeUE7MnXsrD5cXHOkv-NMSUPvlJuzKlGpguecZgNRmp6zJ8h-5LCtISVw"></div><div><div class="font-body-md text-body-md font-bold text-surface-bright leading-tight">Marcus Vance</div><div class="font-caption text-caption text-on-primary-container/80">All-Star Point Guard &amp; Health Advocate</div></div></div></div></section>
+<!-- Footer details -->
+<section class="mt-4 border-t border-outline-variant/30 pt-6">
+<a class="flex items-center justify-between py-3 group" href="#">
+<span class="font-body-md text-body-md text-on-surface font-medium group-hover:text-primary transition-colors">Where to buy supplements</span>
+<span class="material-symbols-outlined text-outline group-hover:text-primary transition-colors">chevron_right</span>
+</a>
+<!-- Simple Accordion JS -->
+<div class="py-3 cursor-pointer group" onclick="document.getElementById('sources-content').classList.toggle('hidden'); document.getElementById('sources-icon').textContent = document.getElementById('sources-content').classList.contains('hidden') ? 'expand_more' : 'expand_less';">
+<div class="flex items-center justify-between">
+<span class="font-body-md text-body-md text-on-surface font-medium group-hover:text-primary transition-colors">Scientific Sources</span>
+<span class="material-symbols-outlined text-outline group-hover:text-primary transition-colors" id="sources-icon">expand_more</span>
+</div>
+<div class="hidden mt-3 font-caption text-caption text-outline space-y-2 pl-2 border-l-2 border-surface-variant" id="sources-content">
+<p class="">National Institutes of Health (NIH) Office of Dietary Supplements: Vitamin D Fact Sheet for Health Professionals.</p>
+<p class="">Institute of Medicine, Food and Nutrition Board: Dietary Reference Intakes for Calcium and Vitamin D.</p>
+</div>
+</div>
+</section>
+</div>
+</main>
+<!-- Sticky CTA -->
+<div class="fixed bottom-0 left-0 w-full max-w-2xl bg-surface-bright/90 backdrop-blur-md p-4 border-t border-outline-variant/20 shadow-[0_-4px_12px_rgba(2,40,81,0.06)] z-20 left-1/2 -translate-x-1/2">
+<button class="w-full bg-primary text-on-primary font-body-lg text-body-lg font-bold py-3 px-6 rounded-full hover:bg-primary-container transition-colors shadow-e1">
+                Add to my routine
+            </button>
+</div>
+</div>
+
+
+
+
+</body></html>
