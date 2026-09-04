@@ -1,10 +1,12 @@
 import { StyleSheet, Text, View } from 'react-native';
-import { colors, radius, spacing, typography } from '../../theme';
+import { NEUTRAL_ACCENT, colors, radius, spacing, typography, type Accent } from '../../theme';
 import { Icon, type IconName } from '../ui/Icon';
 
 type Props = {
   label: string;
   icon: IconName;
+  /** Nutrient identity colour. Chips sit on a tinted card, so they go white. */
+  accent?: Accent;
 };
 
 /**
@@ -14,11 +16,11 @@ type Props = {
  * reference; the detail page carries portions and amounts on a much larger
  * card. See components/nutrient/SourceCard.
  */
-export function FoodChip({ label, icon }: Props) {
+export function FoodChip({ label, icon, accent = NEUTRAL_ACCENT }: Props) {
   return (
     <View style={styles.chip}>
-      <Icon name={icon} size={16} color={colors.onSurfaceVariant} />
-      <Text style={styles.label}>{label}</Text>
+      <Icon name={icon} size={16} color={accent.text} />
+      <Text style={[styles.label, { color: accent.text }]}>{label}</Text>
     </View>
   );
 }
@@ -31,10 +33,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.stackSm,
     paddingVertical: spacing.base,
     borderRadius: radius.full,
-    backgroundColor: colors.surfaceContainer,
+    // White, because the card behind is already the accent's pale wash.
+    backgroundColor: colors.surfaceContainerLowest,
   },
   label: {
     ...typography.caption,
-    color: colors.onSurfaceVariant,
   },
 });

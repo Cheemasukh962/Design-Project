@@ -1,4 +1,5 @@
 import type { IconName } from '../components/ui/Icon';
+import { accents, NEUTRAL_ACCENT, type Accent, type AccentName } from '../theme';
 
 export type FoodSource = {
   label: string;
@@ -49,6 +50,11 @@ export type Nutrient = {
   name: string;
   /** Letter mark shown in the rounded square. Icons are unreadable this small. */
   letter: string;
+  /**
+   * This nutrient's permanent identity colour. See theme/accents.ts — it means
+   * the nutrient and never the status, so it does not change with progress.
+   */
+  accent: AccentName;
   /** One plain sentence. No jargon, no hedging. */
   summary: string;
   /** The "Essential for" grid at the top of the detail page. */
@@ -76,6 +82,7 @@ export type Nutrient = {
 export const NUTRIENTS: Record<string, Nutrient> = {
   d: {
     id: 'd',
+    accent: 'gold',
     name: 'Vitamin D',
     letter: 'D',
     summary: 'Helps your body absorb calcium and supports your immune system.',
@@ -110,6 +117,7 @@ export const NUTRIENTS: Record<string, Nutrient> = {
   },
   b12: {
     id: 'b12',
+    accent: 'violet',
     name: 'Vitamin B12',
     letter: 'B12',
     summary: 'Supports nerve function and helps turn food into energy.',
@@ -136,6 +144,7 @@ export const NUTRIENTS: Record<string, Nutrient> = {
   },
   c: {
     id: 'c',
+    accent: 'orange',
     name: 'Vitamin C',
     letter: 'C',
     summary: 'An antioxidant that supports healing and iron absorption.',
@@ -162,6 +171,7 @@ export const NUTRIENTS: Record<string, Nutrient> = {
   },
   iron: {
     id: 'iron',
+    accent: 'bronze',
     name: 'Iron',
     letter: 'Fe',
     summary: 'Carries oxygen around your body; low iron shows up as fatigue.',
@@ -188,6 +198,7 @@ export const NUTRIENTS: Record<string, Nutrient> = {
   },
   calcium: {
     id: 'calcium',
+    accent: 'teal',
     name: 'Calcium',
     letter: 'Ca',
     summary: 'Builds and maintains bone, and your bones are still forming into your twenties.',
@@ -213,3 +224,9 @@ export const NUTRIENTS: Record<string, Nutrient> = {
     ],
   },
 };
+
+/** The identity colour for a nutrient id, falling back to the neutral blue. */
+export function accentFor(nutrientId: string): Accent {
+  const name = NUTRIENTS[nutrientId]?.accent;
+  return name ? accents[name] : NEUTRAL_ACCENT;
+}

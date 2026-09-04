@@ -3,7 +3,7 @@ import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { LetterMark } from '../../components/nutrient/LetterMark';
 import { Icon } from '../../components/ui/Icon';
 import { Screen } from '../../components/ui/Screen';
-import { NUTRIENTS } from '../../data/nutrients';
+import { NUTRIENTS, accentFor } from '../../data/nutrients';
 import { ARTICLES } from '../../data/progress';
 import { colors, radius, spacing, typography } from '../../theme';
 
@@ -60,7 +60,11 @@ export default function DiscoverRoute() {
               }
               style={({ pressed }) => [styles.row, pressed && styles.pressed]}
             >
-              <LetterMark letter={nutrient.letter} size={40} />
+              <LetterMark
+                letter={nutrient.letter}
+                size={40}
+                accent={accentFor(nutrient.id)}
+              />
               <View style={styles.rowText}>
                 <Text style={styles.rowTitle}>{nutrient.name}</Text>
                 <Text style={styles.rowBody} numberOfLines={2}>

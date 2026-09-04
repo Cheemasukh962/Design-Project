@@ -1,6 +1,6 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
-import { ACCENT, type NutrientProgress } from '../../data/progress';
-import type { Nutrient } from '../../data/nutrients';
+import type { NutrientProgress } from '../../data/progress';
+import { accentFor, type Nutrient } from '../../data/nutrients';
 import { colors, radius, spacing, typography } from '../../theme';
 import { Icon } from '../ui/Icon';
 import { Photo } from '../ui/Photo';
@@ -23,7 +23,8 @@ export const CARD_WIDTH = 142;
  * only draws what it is handed.
  */
 export function NutrientProgressCard({ nutrient, progress, onPress }: Props) {
-  const accent = ACCENT[progress.accent];
+  // The nutrient's permanent colour, not a colour for how it is going.
+  const accent = accentFor(nutrient.id);
   const complete = progress.percent >= 100;
 
   return (
@@ -37,19 +38,21 @@ export function NutrientProgressCard({ nutrient, progress, onPress }: Props) {
         pressed && styles.pressed,
       ]}
     >
-      <View style={[styles.photoRing, { borderColor: accent.base, backgroundColor: accent.surface }]}>
+      <View style={[styles.photoRing, { borderColor: accent.border, backgroundColor: accent.surface }]}>
         <Photo
           uri={undefined}
           icon={nutrient.foods[0]?.icon ?? 'fruit-citrus'}
           tint={accent.surface}
-          iconColor={accent.text}
+          iconColor={accent.base}
           radiusToken={radius.sm}
           style={styles.photo}
         />
         <View
           style={[
             styles.overlay,
-            { backgroundColor: complete ? 'rgba(4,120,87,0.85)' : 'rgba(0,20,46,0.8)' },
+            // Completion is a status, so it stays green — the one place a
+            // status colour is allowed, because it is not naming the nutrient.
+            { backgroundColor: complete ? 'rgba(46,125,91,0.9)' : 'rgba(0,20,46,0.8)' },
           ]}
         >
           <Text style={styles.overlayText}>

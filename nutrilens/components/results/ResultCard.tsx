@@ -1,6 +1,6 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import type { Finding } from '../../data/inference';
-import type { FoodSource } from '../../data/nutrients';
+import { accentFor, type FoodSource } from '../../data/nutrients';
 import { colors, radius, spacing, typography } from '../../theme';
 import { FoodChip } from '../nutrient/FoodChip';
 import { Icon } from '../ui/Icon';
@@ -35,26 +35,38 @@ type Props = {
  *
  * Note what is still absent: no percentage, no meter, no confidence score.
  * Nothing was measured, so nothing here may look measured.
+ *
+ * COLOUR. The mock draws every card white on a near-white page, which made
+ * three results read as one grey wall with nothing to tell them apart. Each
+ * card now carries its nutrient's identity colour (theme/accents.ts) as a pale
+ * wash, a hairline and the heading. No new elements were added — the layout is
+ * the mock's, only recoloured — and the colour means the nutrient, never how
+ * the user is doing at it.
  */
 export function ResultCard({ finding, foods, onOpen }: Props) {
   const { nutrient, reason } = finding;
+  const accent = accentFor(nutrient.id);
 
   return (
     <Pressable
       accessibilityRole="button"
       accessibilityLabel={`${nutrient.name}. ${nutrient.summary} ${reason}`}
       onPress={onOpen}
-      style={({ pressed }) => [styles.card, pressed && styles.pressed]}
+      style={({ pressed }) => [
+        styles.card,
+        { backgroundColor: accent.surface, borderColor: accent.border },
+        pressed && styles.pressed,
+      ]}
     >
       <View style={styles.head}>
-        <Text style={styles.name}>{nutrient.name}</Text>
-        <Icon name="chevron-right" size={20} color={colors.outline} />
+        <Text style={[styles.name, { color: accent.text }]}>{nutrient.name}</Text>
+        <Icon name="chevron-right" size={20} color={accent.text} />
       </View>
 
       <Text style={styles.summary}>{nutrient.summary}</Text>
 
       <View style={styles.reason}>
-        <Icon name="info-outline" size={16} color={colors.onSecondaryContainer} />
+        <Icon name="info-outline" size={16} color={accent.text} />
         <Text style={styles.reasonText}>{reason}</Text>
       </View>
 
@@ -63,7 +75,12 @@ export function ResultCard({ finding, foods, onOpen }: Props) {
           foods
             .slice(0, 3)
             .map((food) => (
-              <FoodChip key={food.label} label={food.label} icon={food.icon} />
+              <FoodChip
+                key={food.label}
+                label={food.label}
+                icon={food.icon}
+                accent={accent}
+              />
             ))
         ) : (
           // Every common source is excluded by what they told us in Q5. Saying
@@ -81,11 +98,9 @@ export function ResultCard({ finding, foods, onOpen }: Props) {
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: colors.surfaceContainerLowest,
     borderRadius: radius.md,
     padding: spacing.cardPaddingSm,
     borderWidth: 1,
-    borderColor: colors.surfaceContainer,
     gap: spacing.stackSm,
     shadowColor: '#435f8b',
     shadowOffset: { width: 0, height: 4 },
@@ -93,7 +108,7 @@ const styles = StyleSheet.create({
     shadowRadius: 12,
     elevation: 2,
   },
-  pressed: { backgroundColor: '#FCFDFF' },
+  pressed: { opacity: 0.88 },
   head: {
     flexDirection: 'row',
     alignItems: 'flex-start',
@@ -102,7 +117,6 @@ const styles = StyleSheet.create({
   },
   name: {
     ...typography.h2,
-    color: colors.primary,
     flex: 1,
   },
   summary: {
@@ -115,7 +129,9 @@ const styles = StyleSheet.create({
     gap: spacing.stackSm,
     padding: spacing.stackSm + spacing.base,
     borderRadius: radius.base,
-    backgroundColor: colors.tintGold,
+    // White rather than gold: the card behind is already tinted, and two washes
+    // stacked turned the reason - the most important line - into mud.
+    backgroundColor: 'rgba(255,255,255,0.75)',
   },
   reasonText: {
     ...typography.caption,

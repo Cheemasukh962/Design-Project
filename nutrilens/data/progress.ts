@@ -40,33 +40,6 @@ export const ACCOUNT = {
   questsTotal: 3,
 } as const;
 
-export type NutrientAccent = 'amber' | 'emerald' | 'rose';
-
-/** The three-colour accent families the Home cards use. */
-export const ACCENT: Record<
-  NutrientAccent,
-  { base: string; border: string; surface: string; text: string }
-> = {
-  amber: {
-    base: colors.amber,
-    border: colors.amberBorder,
-    surface: colors.amberSurface,
-    text: colors.amberText,
-  },
-  emerald: {
-    base: colors.emeraldStrong,
-    border: colors.emeraldBorder,
-    surface: colors.emeraldSurface,
-    text: colors.emeraldText,
-  },
-  rose: {
-    base: colors.rose,
-    border: colors.roseBorder,
-    surface: colors.roseSurface,
-    text: colors.roseText,
-  },
-};
-
 export type NutrientProgress = {
   /** Percentage shown on the card overlay and the bar. Invented. */
   percent: number;
@@ -77,8 +50,15 @@ export type NutrientProgress = {
   /** The buff chip, e.g. "+20 Bone Shield". Invented. */
   buff: string;
   buffEmoji: string;
-  accent: NutrientAccent;
 };
+
+/**
+ * NOTE — the accent field that used to live here is gone. Colour on the Home
+ * cards used to encode how "full" a nutrient was, which is what put a red on
+ * Vitamin B12 at 50% and broke the guardrail against red for a nutrition
+ * state. Colour is now the nutrient's permanent identity (theme/accents.ts)
+ * and quantity lives on the progress bar, where a quantity belongs.
+ */
 
 /**
  * Per-nutrient card state on Home. Values are taken straight from the mock for
@@ -92,7 +72,6 @@ export const NUTRIENT_PROGRESS: Record<string, NutrientProgress> = {
     badgeIcon: 'stars',
     buff: '+20 Bone Shield',
     buffEmoji: '🛡️',
-    accent: 'amber',
   },
   c: {
     percent: 100,
@@ -100,7 +79,6 @@ export const NUTRIENT_PROGRESS: Record<string, NutrientProgress> = {
     badgeIcon: 'check-circle',
     buff: '+25 Immunity',
     buffEmoji: '🌿',
-    accent: 'emerald',
   },
   b12: {
     percent: 50,
@@ -108,7 +86,6 @@ export const NUTRIENT_PROGRESS: Record<string, NutrientProgress> = {
     badgeIcon: 'local-fire-department',
     buff: '+15 Energy',
     buffEmoji: '⚡',
-    accent: 'rose',
   },
 };
 
@@ -118,7 +95,6 @@ export const DEFAULT_PROGRESS: NutrientProgress = {
   badgeIcon: 'stars',
   buff: 'Not started',
   buffEmoji: '✨',
-  accent: 'amber',
 };
 
 export function progressFor(nutrientId: string): NutrientProgress {

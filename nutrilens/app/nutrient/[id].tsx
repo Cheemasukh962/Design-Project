@@ -8,7 +8,7 @@ import { AppBar } from '../../components/ui/AppBar';
 import { Button } from '../../components/ui/Button';
 import { Icon } from '../../components/ui/Icon';
 import { Screen } from '../../components/ui/Screen';
-import { NUTRIENTS } from '../../data/nutrients';
+import { NUTRIENTS, accentFor } from '../../data/nutrients';
 import { useQuiz } from '../../data/QuizContext';
 import { applyRestrictions } from '../../data/restrictions';
 import { useRoutine } from '../../data/RoutineContext';
@@ -46,6 +46,7 @@ export default function NutrientDetailRoute() {
   const inRoutine = added.includes(nutrient.id);
   // Never show a source the user told us in Q5 that they do not eat.
   const foods = applyRestrictions(nutrient.foods, answers.restrictions);
+  const accent = accentFor(nutrient.id);
 
   return (
     <Screen padded={false}>
@@ -74,8 +75,10 @@ export default function NutrientDetailRoute() {
               A tinted plate carrying the nutrient's own mark fills the frame
               deliberately instead of showing an empty image box — and a real
               photo drops into the same frame with no layout change. */}
-          <View style={styles.heroPlate}>
-            <Text style={styles.heroMark}>{nutrient.letter}</Text>
+          <View style={[styles.heroPlate, { backgroundColor: accent.surface }]}>
+            <Text style={[styles.heroMark, { color: accent.base }]}>
+              {nutrient.letter}
+            </Text>
           </View>
         </View>
 
@@ -92,7 +95,7 @@ export default function NutrientDetailRoute() {
           contentContainerStyle={styles.rail}
         >
           {foods.map((source) => (
-            <SourceCard key={source.label} source={source} />
+            <SourceCard key={source.label} source={source} accent={accent} />
           ))}
         </ScrollView>
 
@@ -220,7 +223,6 @@ const styles = StyleSheet.create({
     height: 128,
     width: '100%',
     borderRadius: radius.base,
-    backgroundColor: colors.surfaceContainer,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -229,7 +231,6 @@ const styles = StyleSheet.create({
     fontSize: 56,
     lineHeight: 64,
     letterSpacing: -1.2,
-    color: colors.surfaceTint,
   },
   sectionHead: {
     flexDirection: 'row',

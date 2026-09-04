@@ -1,10 +1,12 @@
 import { StyleSheet, Text, View } from 'react-native';
 import type { FoodSource } from '../../data/nutrients';
-import { colors, radius, spacing, typography } from '../../theme';
+import { NEUTRAL_ACCENT, colors, radius, spacing, typography, type Accent } from '../../theme';
 import { Icon } from '../ui/Icon';
 
 type Props = {
   source: FoodSource;
+  /** The nutrient's identity colour — see theme/accents.ts. */
+  accent?: Accent;
 };
 
 export const SOURCE_CARD_WIDTH = 176;
@@ -20,18 +22,18 @@ export const SOURCE_CARD_WIDTH = 176;
  * in data/nutrients.ts. Leaving the badge off is the correct rendering for a
  * source whose number has not been checked yet.
  */
-export function SourceCard({ source }: Props) {
+export function SourceCard({ source, accent = NEUTRAL_ACCENT }: Props) {
   return (
     <View style={styles.card} accessibilityLabel={
       `${source.label}. ${source.amount ? `${source.amount}. ` : ''}${source.portion ?? ''}`
     }>
       <View style={styles.top}>
-        <View style={styles.iconTile}>
-          <Icon name={source.icon} size={22} color={colors.surfaceTint} />
+        <View style={[styles.iconTile, { backgroundColor: accent.surface }]}>
+          <Icon name={source.icon} size={22} color={accent.base} />
         </View>
         {source.amount && (
-          <View style={styles.badge}>
-            <Text style={styles.badgeText}>{source.amount}</Text>
+          <View style={[styles.badge, { backgroundColor: accent.surface }]}>
+            <Text style={[styles.badgeText, { color: accent.text }]}>{source.amount}</Text>
           </View>
         )}
       </View>
@@ -75,7 +77,6 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: radius.base,
-    backgroundColor: colors.surfaceContainer,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -83,12 +84,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.stackSm,
     paddingVertical: 2,
     borderRadius: radius.full,
-    backgroundColor: 'rgba(213,227,255,0.4)',
   },
   badgeText: {
     ...typography.caption,
     fontFamily: typography.micro.fontFamily,
-    color: colors.primary,
   },
   label: {
     ...typography.bodyMd,

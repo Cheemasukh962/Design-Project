@@ -62,6 +62,32 @@ tools/          shoot.mjs (headless render) cutout.mjs avatar.mjs
 **The rule that keeps it modular: nothing outside `theme/` hardcodes a colour or
 a spacing value.** A palette change is one file.
 
+### Nutrient identity colours
+
+Each of the five nutrients owns a permanent hue (`theme/accents.ts`), used on
+its letter mark, result card, detail hero and Home card:
+
+| | | |
+|---|---|---|
+| Vitamin D | gold `#EAB308` | the sun, closest to the brand gold |
+| Vitamin C | orange `#EA580C` | citrus, pushed red-ward so it never reads as gold |
+| Vitamin B12 | violet `#7C5CFF` | no natural colour, so the most distinct hue |
+| Iron | bronze `#7C2D12` | literal, and dark enough not to compete with C |
+| Calcium | teal `#0E7C86` | the only cold accent in the set |
+
+**One rule, and it is absolute: a colour means a nutrient, never a status.**
+Gold is Vitamin D whether the user is doing well or badly at it. The moment
+orange also means "warning", every screen has to be read twice.
+
+This replaced the earlier scheme where Home coloured a card by how "full" the
+nutrient was — which is what put a red on B12 at 50% and broke the guardrail
+against red for a nutrition state. Quantity now lives on the progress bar,
+where a quantity belongs. Red is absent from the palette entirely.
+
+Note the one deliberate exception: the green completion badge on a Home card
+and the green tick on a routine row are statuses, not nutrients. They are
+allowed because they never name a nutrient.
+
 ### Reading the mocks' Tailwind config
 
 The exported HTML overrides Tailwind's defaults, so class names do not mean
@@ -151,6 +177,7 @@ those is the one option that is not on the table.
 | 4 | Hardcoded "Today, Oct 24"; week pre-filled | Real date; week from a flagged constant | A date that is wrong the day after the demo undermines the daily screen. |
 | 5 | Food photography (Stitch CDN URLs) | Tinted plate with the nutrient's mark | We do not own the photos and those URLs expire. Same frame, so a real photo drops in with no layout change. |
 | 6 | Bitmap logo in the Home header | Wordmark set in type beside Vito | No logo asset. Swap in `HomeHeader`. |
+| 8 | Results cards all white; Home cards coloured by progress level | Both carry the nutrient's identity hue | Three white cards on a near-white page read as one grey wall. No elements were added — the mock's layout, recoloured. |
 | 7 | Q1 on `#f8f9ff`, 3 dots, pill CTA | Q2's treatment throughout the quiz | The two quiz mocks came from different batches and read as different apps one tap apart. Q2 is newer and matches the five-question spec. |
 
 ## Still open
@@ -162,9 +189,6 @@ those is the one option that is not on the table.
 - **Every %DV figure on the detail page is unverified.** They came from the mock.
   Check each against the NIH Office of Dietary Supplements fact sheet
   (ods.od.nih.gov) and cite it. The Sources accordion says so on screen.
-- **The rose accent on Home is a red** marking a low nutrient state (B12, "Lv.1 /
-  50%"), which the PRD guardrail says never to do. Flagged in `theme/colors.ts`.
-  Either accept it or move the low state to a neutral or gold.
 - **Q3–Q5 have no mocks.** Authored against the PRD. Each exists because a
   specific result line needs it: Q3 → the vitamin D reason, Q4 → vitamin C,
   Q5 → narrows everything.
