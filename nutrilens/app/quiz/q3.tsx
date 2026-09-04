@@ -8,13 +8,18 @@ import { InsightCard } from '../../components/ui/InsightCard';
 import { Screen } from '../../components/ui/Screen';
 import { useQuiz } from '../../data/QuizContext';
 import { Q3, TOTAL_STEPS } from '../../data/quiz';
-import { spacing, typography } from '../../theme';
+import { colors, spacing, typography } from '../../theme';
 
 /**
  * Quiz question 3 — daylight exposure. Single select.
  *
- * No Stitch mock exists for this screen; it is authored to Q1's pattern.
- * It earns its place by producing the Vitamin D reason on the Results screen.
+ * No Stitch mock exists for this screen. It follows Q2's chrome — cream ground,
+ * five-dot stepper, mascot chip, 52px CTA — and Q1's single-select rows, since
+ * the round radio marker is what distinguishes "one of these" from Q2's square
+ * multi-select checkboxes.
+ *
+ * It earns its step by producing the Vitamin D reason on Results: without an
+ * answer here, that finding cannot cite anything the user actually said.
  */
 export default function Q3Route() {
   const { answers, setSingle } = useQuiz();
@@ -31,7 +36,6 @@ export default function Q3Route() {
           <Text style={styles.question} accessibilityRole="header">
             {Q3.question}
           </Text>
-          <Text style={styles.helper}>{Q3.helper}</Text>
         </View>
 
         <View style={styles.options} accessibilityRole="radiogroup">
@@ -45,11 +49,11 @@ export default function Q3Route() {
           ))}
         </View>
 
-        {selected && (
-          <View style={styles.insight}>
-            <InsightCard>{Q3.insight}</InsightCard>
-          </View>
-        )}
+        {/* Always visible, as on Q2. It says why we ask, never what a good
+            answer looks like — see the priming note in data/quiz.ts. */}
+        <View style={styles.insight}>
+          <InsightCard>{Q3.insight}</InsightCard>
+        </View>
       </ScrollView>
 
       <View style={styles.footer}>
@@ -68,9 +72,12 @@ export default function Q3Route() {
 const styles = StyleSheet.create({
   body: { paddingTop: spacing.base, paddingBottom: spacing.stackLg },
   heading: { marginTop: spacing.stackMd, marginBottom: spacing.stackLg, gap: 6 },
-  question: { ...typography.h1, color: '#0F1720' },
-  helper: { ...typography.bodyMd, color: '#4A5563' },
+  question: { ...typography.h1, color: colors.ink },
   options: { gap: spacing.stackMd },
   insight: { marginTop: spacing.stackLg },
-  footer: { paddingTop: spacing.base * 3, paddingBottom: spacing.stackSm },
+  footer: {
+    paddingTop: spacing.base * 3,
+    paddingBottom: spacing.stackSm,
+    backgroundColor: colors.cream,
+  },
 });

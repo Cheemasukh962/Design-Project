@@ -50,13 +50,27 @@ export function inferFindings(answers: QuizAnswers): Finding[] {
       outside === 'under-15'
         ? "You said you're outside under 15 minutes on a normal day."
         : "You said you're outside around 15 to 30 minutes on a normal day.";
-    const dietaryBackup = eats('fish') || eats('dairy');
+    // Fish and fortified dairy are the two food routes that partly cover a
+    // low-daylight day. A declared restriction closes one outright, which is
+    // stronger evidence than simply not having ticked it in Q2.
+    const noFish = avoids('no-fish');
+    const noDairy = avoids('no-dairy');
+    const dietaryBackup = (eats('fish') && !noFish) || (eats('dairy') && !noDairy);
+
+    let reason = answerText;
+    if (noFish || noDairy) {
+      const off = [noFish ? 'fish' : null, noDairy ? 'dairy' : null].filter(
+        (x): x is string => x !== null,
+      );
+      reason = `${answerText} You also told us no ${orList(off)}, which rules out the main food sources.`;
+    } else if (!dietaryBackup) {
+      reason = `${answerText} You also didn't pick fish or dairy.`;
+    }
+
     findings.push({
       nutrient: NUTRIENTS.d,
-      reason: dietaryBackup
-        ? answerText
-        : `${answerText} You also didn't pick fish or dairy.`,
-      weight: outside === 'under-15' ? 100 : 80,
+      reason,
+      weight: (outside === 'under-15' ? 100 : 80) + (noFish || noDairy ? 5 : 0),
     });
   }
 
@@ -65,16 +79,23 @@ export function inferFindings(answers: QuizAnswers): Finding[] {
   const picked = b12Sources.filter(eats);
   const missing = b12Sources.filter((id) => !eats(id));
   if (picked.length <= 1 || avoids('no-meat')) {
-    const reason =
+    const base =
       picked.length === 0
         ? `You didn't pick ${orList(missing.map(foodLabel))} — B12 comes almost entirely from animal foods.`
         : `You picked ${orList(picked.map(foodLabel))} but not ${orList(missing.map(foodLabel))}.`;
+    let b12Reason = base;
+    if (avoids('no-meat')) {
+      b12Reason = `${b12Reason} You also told us: ${restrictionLabel('no-meat').toLowerCase()}.`;
+    }
+    // Fortified cereal is the standard non-animal B12 route and most of it is
+    // wheat-based, so gluten free narrows an already narrow set of options.
+    if (avoids('gluten-free')) {
+      b12Reason = `${b12Reason} Fortified cereal is the usual alternative, and most of it contains gluten.`;
+    }
     findings.push({
       nutrient: NUTRIENTS.b12,
-      reason: avoids('no-meat')
-        ? `${reason} You also told us: ${restrictionLabel('no-meat').toLowerCase()}.`
-        : reason,
-      weight: picked.length === 0 ? 95 : 75,
+      reason: b12Reason,
+      weight: (picked.length === 0 ? 95 : 75) + (avoids('gluten-free') ? 5 : 0),
     });
   }
 
@@ -92,7 +113,7 @@ export function inferFindings(answers: QuizAnswers): Finding[] {
   }
 
   // ---- Iron: plant iron absorbs less well than the animal kind ------------
-  if ((!eats('meat') && !eats('fish')) || avoids('no-meat')) {
+  if ((!eats('meat') && !eats('fish')) || avoids('no-meat') || avoids('no-fish')) {
     const alternatives = ['beans', 'greens'].filter(eats).map(foodLabel);
     findings.push({
       nutrient: NUTRIENTS.iron,
@@ -117,6 +138,26 @@ export function inferFindings(answers: QuizAnswers): Finding[] {
   // Never show more than three. Four or more reads as "everything is wrong
   // with you" and produces paralysis rather than a next step.
   return findings.sort((a, b) => b.weight - a.weight).slice(0, 3);
+}
+
+/**
+ * Has the user answered anything at all?
+ *
+ * This gates the fall back to DEMO_ANSWERS. It has to consider all five
+ * questions: an earlier version checked only Q1 and Q2, so anyone who entered
+ * the flow partway — or answered only the restrictions question — had their
+ * real answers silently replaced by the demo persona. Showing someone a result
+ * built from a stranger's diet, with no indication it is not theirs, is the
+ * worst failure this screen has.
+ */
+export function hasAnswers(a: QuizAnswers): boolean {
+  return (
+    a.eating !== undefined ||
+    a.outside !== undefined ||
+    a.produce !== undefined ||
+    a.foods.length > 0 ||
+    a.restrictions.length > 0
+  );
 }
 
 /** Answers used by the demo when someone taps straight through to Results. */

@@ -7,6 +7,7 @@ import {
   type ReactNode,
 } from 'react';
 import { SEED_DEMO_ROUTINE, SEED_DONE, SEED_NUTRIENTS } from './progress';
+import { useQuiz } from './QuizContext';
 
 export type RoutineItemType = 'supplement' | 'food' | 'habit';
 
@@ -38,14 +39,36 @@ type RoutineStore = {
  * would fix is the wrong instinct — and it is the reason the PRD warns against
  * a pill-shaped mascot.
  */
-const EXPANSIONS: Record<string, Omit<RoutineItem, 'id' | 'nutrientId'>[]> = {
+type Expansion = Omit<RoutineItem, 'id' | 'nutrientId'> & {
+  /** Restriction ids that remove this item entirely. */
+  excludedBy?: string[];
+  /**
+   * Restriction id -> replacement title. Most items narrow rather than drop:
+   * telling someone who avoids dairy that calcium is simply unavailable to them
+   * would be both wrong and the opposite of useful, since they are exactly the
+   * person the finding was raised for.
+   */
+  narrows?: Record<string, string>;
+};
+
+const EXPANSIONS: Record<string, Expansion[]> = {
   d: [
     { title: 'Vitamin D3, 1,000 IU', detail: 'Morning, with food', type: 'supplement' },
     { title: '15 minutes outside', detail: 'Around midday', type: 'habit' },
-    { title: 'Salmon fillet or 2 eggs', detail: 'Lunch or dinner', type: 'food' },
+    {
+      title: 'Salmon fillet or 2 eggs',
+      detail: 'Lunch or dinner',
+      type: 'food',
+      narrows: { 'no-fish': '2 eggs' },
+    },
   ],
   b12: [
-    { title: 'Fortified cereal or nutritional yeast', detail: 'Breakfast', type: 'food' },
+    {
+      title: 'Fortified cereal or nutritional yeast',
+      detail: 'Breakfast',
+      type: 'food',
+      narrows: { 'gluten-free': 'Gluten-free fortified cereal or nutritional yeast' },
+    },
     { title: 'B12 supplement', detail: 'Morning', type: 'supplement' },
   ],
   c: [
@@ -56,7 +79,12 @@ const EXPANSIONS: Record<string, Omit<RoutineItem, 'id' | 'nutrientId'>[]> = {
     { title: 'Beans, lentils or leafy greens', detail: 'With something citrus', type: 'food' },
   ],
   calcium: [
-    { title: 'Fortified milk or yoghurt', detail: 'Breakfast', type: 'food' },
+    {
+      title: 'Fortified milk or yoghurt',
+      detail: 'Breakfast',
+      type: 'food',
+      narrows: { 'no-dairy': 'Fortified plant milk, tofu or leafy greens' },
+    },
   ],
 };
 
@@ -88,16 +116,35 @@ export function RoutineProvider({ children }: { children: ReactNode }) {
     );
   }, []);
 
+  // The routine has to respect Q5 for the same reason Results does: adding
+  // salmon to the daily list of someone who just told us "no fish" is the
+  // fastest way to prove the quiz was decorative.
+  const { answers } = useQuiz();
+  const restrictions = answers.restrictions;
+
   const items = useMemo<RoutineItem[]>(
     () =>
       added.flatMap((nutrientId) =>
-        (EXPANSIONS[nutrientId] ?? []).map((item, i) => ({
-          ...item,
-          nutrientId,
-          id: `${nutrientId}-${i}`,
-        })),
+        (EXPANSIONS[nutrientId] ?? [])
+          .filter(
+            (item) => !item.excludedBy?.some((id) => restrictions.includes(id)),
+          )
+          .map(({ excludedBy: _excludedBy, narrows, ...item }, i) => {
+            const narrowed = restrictions
+              .map((id) => narrows?.[id])
+              .find(Boolean);
+            return {
+              ...item,
+              title: narrowed ?? item.title,
+              nutrientId,
+              // Index is stable across restriction changes because filtering
+              // happens before mapping - ids stay tied to position in the
+              // surviving list, which is what `done` refers to.
+              id: `${nutrientId}-${i}`,
+            };
+          }),
       ),
-    [added],
+    [added, restrictions],
   );
 
   const value = useMemo(

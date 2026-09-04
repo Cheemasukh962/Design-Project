@@ -14,14 +14,19 @@ import { colors, spacing, typography } from '../../theme';
 /**
  * Quiz question 5 — dietary restrictions. Multi select.
  *
- * No Stitch mock exists; authored to Q2's pattern. This is the segment
- * question — a restriction is the one constraint a user already knows they
- * have, so it is the strongest signal in the whole quiz.
+ * No Stitch mock exists; authored to Q2's pattern, which is right because this
+ * is the same kind of question: recognition over recall, across a grid.
+ *
+ * This is the segment question. A restriction is the one constraint a user
+ * already knows they have, so it is the strongest signal in the quiz — and
+ * every option now feeds something downstream (data/restrictions.ts), because
+ * asking someone to declare "no fish" and then recommending salmon is worse
+ * than never asking.
  *
  * "Nothing in particular" is mutually exclusive with everything else: picking
- * it clears the rest, and picking anything else clears it. Without that, a
- * user can submit "no dairy" *and* "nothing in particular" and the inference
- * has to guess which they meant.
+ * it clears the rest, and picking anything else clears it. Without that, a user
+ * can submit "no dairy" AND "nothing in particular", and the inference has to
+ * guess which they meant.
  */
 export default function Q5Route() {
   const { answers, toggleMulti, setMulti } = useQuiz();
@@ -31,6 +36,7 @@ export default function Q5Route() {
   const count = selected.length;
 
   const pick = (id: string) => {
+    // Picking a real restriction clears the exclusive "nothing" answer.
     if (isNone) {
       setMulti('restrictions', [id]);
       return;
@@ -38,8 +44,11 @@ export default function Q5Route() {
     toggleMulti('restrictions', id);
   };
 
-  const pickNone = () =>
-    setMulti('restrictions', isNone ? [] : [Q5.exclusiveId]);
+  const pickNone = () => setMulti('restrictions', isNone ? [] : [Q5.exclusiveId]);
+
+  // "Nothing in particular" is an answer, so it counts toward the CTA label —
+  // but showing "(1 selected)" for it would be nonsense.
+  const realCount = isNone ? 0 : count;
 
   return (
     <Screen background="cream">
@@ -68,18 +77,16 @@ export default function Q5Route() {
           ))}
         </View>
 
-        <NotSureCard label={Q5.noneLabel} onPress={pickNone} />
+        <NotSureCard label={Q5.noneLabel} selected={isNone} onPress={pickNone} />
 
-        {count > 0 && (
-          <View style={styles.insight}>
-            <InsightCard>{Q5.insight}</InsightCard>
-          </View>
-        )}
+        <View style={styles.insight}>
+          <InsightCard>{Q5.insight}</InsightCard>
+        </View>
       </ScrollView>
 
       <View style={styles.footer}>
         <Button
-          label="See my results"
+          label={realCount > 0 ? `See my results (${realCount} selected)` : 'See my results'}
           trailingIcon="arrow-forward"
           shape="rounded"
           disabled={count === 0}
@@ -95,8 +102,8 @@ const GUTTER = spacing.base * 3;
 const styles = StyleSheet.create({
   body: { paddingTop: spacing.base, paddingBottom: spacing.stackLg },
   heading: { marginTop: spacing.stackMd, marginBottom: spacing.stackLg, gap: 6 },
-  question: { ...typography.h1, color: '#0F1720' },
-  helper: { ...typography.bodyMd, color: '#4A5563' },
+  question: { ...typography.h1, color: colors.ink },
+  helper: { ...typography.bodyMd, color: colors.inkMuted },
   grid: {
     flexDirection: 'row',
     flexWrap: 'wrap',

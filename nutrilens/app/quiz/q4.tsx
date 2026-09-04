@@ -8,13 +8,16 @@ import { InsightCard } from '../../components/ui/InsightCard';
 import { Screen } from '../../components/ui/Screen';
 import { useQuiz } from '../../data/QuizContext';
 import { Q4, TOTAL_STEPS } from '../../data/quiz';
-import { spacing, typography } from '../../theme';
+import { colors, spacing, typography } from '../../theme';
 
 /**
- * Quiz question 3 — daylight exposure. Single select.
+ * Quiz question 4 — fruit and vegetable frequency. Single select.
  *
- * No Stitch mock exists for this screen; it is authored to Q1's pattern.
- * It earns its place by producing the Vitamin D reason on the Results screen.
+ * No Stitch mock exists; it follows Q3's pattern exactly, which is the point —
+ * two consecutive single-select questions that differ visually would read as a
+ * change of subject rather than a change of question.
+ *
+ * It earns its step by producing the Vitamin C reason on Results.
  */
 export default function Q4Route() {
   const { answers, setSingle } = useQuiz();
@@ -44,11 +47,9 @@ export default function Q4Route() {
           ))}
         </View>
 
-        {selected && (
-          <View style={styles.insight}>
-            <InsightCard>{Q4.insight}</InsightCard>
-          </View>
-        )}
+        <View style={styles.insight}>
+          <InsightCard>{Q4.insight}</InsightCard>
+        </View>
       </ScrollView>
 
       <View style={styles.footer}>
@@ -67,9 +68,12 @@ export default function Q4Route() {
 const styles = StyleSheet.create({
   body: { paddingTop: spacing.base, paddingBottom: spacing.stackLg },
   heading: { marginTop: spacing.stackMd, marginBottom: spacing.stackLg, gap: 6 },
-  question: { ...typography.h1, color: '#0F1720' },
-  helper: { ...typography.bodyMd, color: '#4A5563' },
+  question: { ...typography.h1, color: colors.ink },
   options: { gap: spacing.stackMd },
   insight: { marginTop: spacing.stackLg },
-  footer: { paddingTop: spacing.base * 3, paddingBottom: spacing.stackSm },
+  footer: {
+    paddingTop: spacing.base * 3,
+    paddingBottom: spacing.stackSm,
+    backgroundColor: colors.cream,
+  },
 });

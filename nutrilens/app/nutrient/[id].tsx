@@ -9,6 +9,8 @@ import { Button } from '../../components/ui/Button';
 import { Icon } from '../../components/ui/Icon';
 import { Screen } from '../../components/ui/Screen';
 import { NUTRIENTS } from '../../data/nutrients';
+import { useQuiz } from '../../data/QuizContext';
+import { applyRestrictions } from '../../data/restrictions';
 import { useRoutine } from '../../data/RoutineContext';
 import { colors, radius, spacing, typography } from '../../theme';
 
@@ -28,6 +30,7 @@ import { colors, radius, spacing, typography } from '../../theme';
 export default function NutrientDetailRoute() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const { added, add } = useRoutine();
+  const { answers } = useQuiz();
 
   const nutrient = NUTRIENTS[id ?? ''];
 
@@ -41,6 +44,8 @@ export default function NutrientDetailRoute() {
   }
 
   const inRoutine = added.includes(nutrient.id);
+  // Never show a source the user told us in Q5 that they do not eat.
+  const foods = applyRestrictions(nutrient.foods, answers.restrictions);
 
   return (
     <Screen padded={false}>
@@ -86,7 +91,7 @@ export default function NutrientDetailRoute() {
           style={styles.railBleed}
           contentContainerStyle={styles.rail}
         >
-          {nutrient.foods.map((source) => (
+          {foods.map((source) => (
             <SourceCard key={source.label} source={source} />
           ))}
         </ScrollView>

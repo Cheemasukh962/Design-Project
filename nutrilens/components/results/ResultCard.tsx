@@ -1,11 +1,18 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import type { Finding } from '../../data/inference';
+import type { FoodSource } from '../../data/nutrients';
 import { colors, radius, spacing, typography } from '../../theme';
 import { FoodChip } from '../nutrient/FoodChip';
 import { Icon } from '../ui/Icon';
 
 type Props = {
   finding: Finding;
+  /**
+   * Food sources already filtered against the user's Q5 restrictions, so this
+   * card never suggests something they told us they do not eat. Passed in
+   * rather than derived here to keep the card presentational.
+   */
+  foods: FoodSource[];
   onOpen: () => void;
 };
 
@@ -29,7 +36,7 @@ type Props = {
  * Note what is still absent: no percentage, no meter, no confidence score.
  * Nothing was measured, so nothing here may look measured.
  */
-export function ResultCard({ finding, onOpen }: Props) {
+export function ResultCard({ finding, foods, onOpen }: Props) {
   const { nutrient, reason } = finding;
 
   return (
@@ -52,9 +59,21 @@ export function ResultCard({ finding, onOpen }: Props) {
       </View>
 
       <View style={styles.chips}>
-        {nutrient.foods.slice(0, 3).map((food) => (
-          <FoodChip key={food.label} label={food.label} icon={food.icon} />
-        ))}
+        {foods.length > 0 ? (
+          foods
+            .slice(0, 3)
+            .map((food) => (
+              <FoodChip key={food.label} label={food.label} icon={food.icon} />
+            ))
+        ) : (
+          // Every common source is excluded by what they told us in Q5. Saying
+          // so is more useful than an empty row, and more honest than showing a
+          // food they already ruled out.
+          <Text style={styles.noFoods}>
+            Your restrictions rule out the usual sources — open this for the
+            alternatives.
+          </Text>
+        )}
       </View>
     </Pressable>
   );
@@ -107,5 +126,10 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
     gap: spacing.stackSm,
+  },
+  noFoods: {
+    ...typography.caption,
+    color: colors.onSurfaceVariant,
+    flex: 1,
   },
 });

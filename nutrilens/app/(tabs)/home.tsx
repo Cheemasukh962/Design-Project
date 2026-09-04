@@ -9,7 +9,7 @@ import { Badge } from '../../components/ui/Badge';
 import { Icon } from '../../components/ui/Icon';
 import { Screen } from '../../components/ui/Screen';
 import { useQuiz } from '../../data/QuizContext';
-import { DEMO_ANSWERS, inferFindings } from '../../data/inference';
+import { DEMO_ANSWERS, hasAnswers, inferFindings } from '../../data/inference';
 import { NUTRIENTS } from '../../data/nutrients';
 import { ACCOUNT, ARTICLES, PROFILE, progressFor } from '../../data/progress';
 import { useRoutine } from '../../data/RoutineContext';
@@ -40,7 +40,7 @@ export default function HomeRoute() {
   const { answers } = useQuiz();
   const { items, done, toggleDone } = useRoutine();
 
-  const tookQuiz = answers.eating !== undefined || answers.foods.length > 0;
+  const tookQuiz = hasAnswers(answers);
   const findings = inferFindings(tookQuiz ? answers : DEMO_ANSWERS);
 
   const nutrients = tookQuiz

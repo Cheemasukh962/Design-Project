@@ -3,11 +3,13 @@ import { useMemo, useState } from 'react';
 import { Image, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { ResultCard } from '../components/results/ResultCard';
 import { BrandBar } from '../components/ui/BrandBar';
+import { Icon } from '../components/ui/Icon';
 import { Button } from '../components/ui/Button';
 import { Screen } from '../components/ui/Screen';
 import { Toast } from '../components/ui/Toast';
 import { useQuiz } from '../data/QuizContext';
-import { DEMO_ANSWERS, inferFindings } from '../data/inference';
+import { DEMO_ANSWERS, hasAnswers, inferFindings } from '../data/inference';
+import { ALLERGY_CAVEAT, applyRestrictions, hasAllergyFlag } from '../data/restrictions';
 import { useRoutine } from '../data/RoutineContext';
 import { colors, radius, spacing, typography } from '../theme';
 
@@ -39,7 +41,7 @@ export default function ResultsRoute() {
 
   // Someone can arrive here without taking the quiz — from Home, or a deep
   // link. Rather than an empty screen, fall back to the demo persona and say so.
-  const tookQuiz = answers.eating !== undefined || answers.foods.length > 0;
+  const tookQuiz = hasAnswers(answers);
   const effective = tookQuiz ? answers : DEMO_ANSWERS;
 
   const findings = useMemo(() => inferFindings(effective), [effective]);
@@ -99,6 +101,7 @@ export default function ResultsRoute() {
             <ResultCard
               key={finding.nutrient.id}
               finding={finding}
+              foods={applyRestrictions(finding.nutrient.foods, effective.restrictions)}
               onOpen={() =>
                 router.push({
                   pathname: '/nutrient/[id]',
@@ -108,6 +111,16 @@ export default function ResultsRoute() {
             />
           ))}
         </View>
+
+        {/* Food allergies is the one Q5 answer we cannot act on — we never
+            asked which ones, and guessing would be dangerous. So it changes
+            what we say rather than what we recommend. */}
+        {hasAllergyFlag(effective.restrictions) && (
+          <View style={styles.caveat}>
+            <Icon name="info-outline" size={18} color={colors.onSecondaryContainer} />
+            <Text style={styles.caveatText}>{ALLERGY_CAVEAT}</Text>
+          </View>
+        )}
 
         <View style={styles.actions}>
           <Button
@@ -186,6 +199,20 @@ const styles = StyleSheet.create({
     opacity: 0.8,
   },
   cards: { gap: spacing.stackMd },
+  caveat: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: spacing.stackSm,
+    marginTop: spacing.stackMd,
+    padding: spacing.cardPaddingSm,
+    borderRadius: radius.md,
+    backgroundColor: colors.tintGold,
+  },
+  caveatText: {
+    ...typography.caption,
+    color: colors.ink,
+    flex: 1,
+  },
   actions: {
     marginTop: spacing.stackLg,
     gap: spacing.stackMd,

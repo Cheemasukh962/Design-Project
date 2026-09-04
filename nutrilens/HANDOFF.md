@@ -21,6 +21,13 @@ npx expo start          # QR code for Expo Go, or press w for browser
 [ Home | Discover | Routine | Profile ]   bottom nav, four tabs
 ```
 
+**On a desktop browser the app is locked to a 393x852 phone canvas**
+(`components/ui/DeviceFrame`). Every screen was designed at that width and the
+layout assumes it — a 1440px-wide Results page stretches its cards into
+unreadable lines and puts the bottom nav where nobody would design it. Native
+is a pass-through, and a browser window narrower than the frame fills the
+viewport instead of letterboxing.
+
 **Two page grounds, and the split is deliberate.** Splash and the quiz sit on
 cream (`#FAF7F0`); everything after sits on the app surface (`#f8f9ff`). That is
 what the mocks do, and it earns its keep: the quiz reads as a distinct, finite
@@ -46,7 +53,8 @@ components/
   routine/      WeekCalendar ProgressRing RoutineItemRow FilterPills ConsistencyMatrix
   brand/        VitoMascot
   splash/       FoldText
-data/           quiz.ts nutrients.ts inference.ts progress.ts QuizContext RoutineContext
+data/           quiz.ts nutrients.ts inference.ts restrictions.ts progress.ts
+                QuizContext RoutineContext
 theme/          colors typography spacing radius
 tools/          shoot.mjs (headless render) cutout.mjs avatar.mjs
 ```
@@ -73,6 +81,23 @@ Every finding carries a `reason` that quotes the user's own answer back:
 
 Research said people reject nutrition advice on **relevance**, not accuracy, so
 a result the user can trace to something they typed is one they can argue with.
+
+### Two rules the quiz is held to
+
+1. **A question that cannot change a result does not belong in the quiz.** This
+   is why the PRD's "what are you hoping to improve?" goal question is absent —
+   it reads well, but nothing downstream consumes it. Q3-Q5 have no mocks and
+   earn their steps by producing the vitamin D, vitamin C and restriction lines.
+2. **An option that cannot change a result does not belong either.** Three of
+   the six Q5 answers used to be collected and then ignored. `restrictions.ts`
+   now makes every one of them do something: exclude a food, rename it, or
+   change what Results says. Asking someone to declare "no fish" and then
+   recommending salmon is worse than never asking.
+
+Restrictions reach Results, the nutrient page **and** the routine. "Food
+allergies" is the one answer we cannot act on — we never asked which ones and
+guessing would be dangerous — so it changes what we say rather than what we
+recommend.
 
 ## Three things to decide before anyone tests this
 
