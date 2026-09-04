@@ -1,5 +1,6 @@
 // Renders the exported web build at iPhone 15 size and writes a PNG.
-// Usage: node tools/shoot.mjs <outfile> [route-without-leading-slash] [waitMs]
+// Usage: node tools/shoot.mjs <outfile> [route-without-leading-slash] [waitMs] [clicks]
+// Env:   VW / VH / VS override viewport width, height and scale factor.
 // Note: the route takes no leading slash, because Git Bash on Windows rewrites
 // a bare "/" argument into a filesystem path before node ever sees it.
 import puppeteer from 'puppeteer';
@@ -27,7 +28,13 @@ const PORT = server.address().port;
 
 const browser = await puppeteer.launch({ headless: 'new', args: ['--no-sandbox'] });
 const page = await browser.newPage();
-await page.setViewport({ width: 393, height: 852, deviceScaleFactor: 2 });
+// Defaults to the iPhone 15 frame the mocks were drawn at. Override with
+// VW/VH to check the desktop presentation, e.g. VW=1440 VH=900.
+await page.setViewport({
+  width: Number(process.env.VW || 393),
+  height: Number(process.env.VH || 852),
+  deviceScaleFactor: Number(process.env.VS || 2),
+});
 
 const errors = [];
 page.on('pageerror', (e) => errors.push(String(e)));

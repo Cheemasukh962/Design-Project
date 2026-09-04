@@ -10,6 +10,7 @@ import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { DeviceFrame } from '../components/ui/DeviceFrame';
 import { QuizProvider } from '../data/QuizContext';
 import { RoutineProvider } from '../data/RoutineContext';
 import { colors } from '../theme';
@@ -42,13 +43,16 @@ export default function RootLayout() {
       <QuizProvider>
         <RoutineProvider>
         <StatusBar style="dark" />
-        <Stack
-        screenOptions={{
-          headerShown: false,
-          contentStyle: { backgroundColor: colors.surface },
-          animation: 'slide_from_right',
-        }}
-        />
+        {/* Locks the browser build to a 393x852 canvas. Pass-through on native. */}
+        <DeviceFrame>
+          <Stack
+            screenOptions={{
+              headerShown: false,
+              contentStyle: { backgroundColor: colors.surface },
+              animation: 'slide_from_right',
+            }}
+          />
+        </DeviceFrame>
         </RoutineProvider>
       </QuizProvider>
     </SafeAreaProvider>
