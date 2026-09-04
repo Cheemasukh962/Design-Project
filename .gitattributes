@@ -1,0 +1,10 @@
+# Normalise line endings so Windows and macOS teammates don't produce
+# whole-file diffs every time they save.
+* text=auto eol=lf
+
+# Binary assets — never touch these.
+*.png binary
+*.jpg binary
+*.ico binary
+*.ttf binary
+*.otf binary

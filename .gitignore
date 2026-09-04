@@ -1,0 +1,18 @@
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editor / tooling
+.vscode/
+.idea/
+*.log
+
+# Claude Code — machine-local state and anything holding credentials.
+# `.claude/settings.json` is deliberately NOT ignored: it is shared project
+# config. The file that has held an API key is ~/.claude.json, outside this repo.
+.claude/settings.local.json
+.claude.json
+
+# Node (nutrilens/.gitignore covers the app subtree in detail)
+node_modules/
