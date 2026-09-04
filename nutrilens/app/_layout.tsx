@@ -11,6 +11,7 @@ import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { DeviceFrame } from '../components/ui/DeviceFrame';
+import { CompanionProvider } from '../data/CompanionContext';
 import { QuizProvider } from '../data/QuizContext';
 import { RoutineProvider } from '../data/RoutineContext';
 import { colors } from '../theme';
@@ -42,6 +43,9 @@ export default function RootLayout() {
     <SafeAreaProvider>
       <QuizProvider>
         <RoutineProvider>
+        {/* Companion sits inside Routine because it awards tokens for ticked
+            items, and inside Quiz because the routine itself reads answers. */}
+        <CompanionProvider>
         <StatusBar style="dark" />
         {/* Locks the browser build to a 393x852 canvas. Pass-through on native. */}
         <DeviceFrame>
@@ -53,6 +57,7 @@ export default function RootLayout() {
             }}
           />
         </DeviceFrame>
+        </CompanionProvider>
         </RoutineProvider>
       </QuizProvider>
     </SafeAreaProvider>

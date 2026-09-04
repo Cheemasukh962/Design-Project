@@ -36,12 +36,16 @@ type Props = {
  * Note what is still absent: no percentage, no meter, no confidence score.
  * Nothing was measured, so nothing here may look measured.
  *
- * COLOUR. The mock draws every card white on a near-white page, which made
- * three results read as one grey wall with nothing to tell them apart. Each
- * card now carries its nutrient's identity colour (theme/accents.ts) as a pale
- * wash, a hairline and the heading. No new elements were added — the layout is
- * the mock's, only recoloured — and the colour means the nutrient, never how
- * the user is doing at it.
+ * COLOUR, AND HOW MUCH OF IT. The mock draws every card white on a near-white
+ * page, which made three results read as one grey wall. The first fix washed
+ * the whole card in the nutrient's identity colour, which was too loud — and
+ * became louder still once the companion introduced three elemental hues of its
+ * own. So the identity now shows as a 4px edge and the heading, on a white
+ * card: enough to tell three results apart at a glance, quiet enough that the
+ * page still reads as a health app rather than a paint chart.
+ *
+ * The rule is unchanged — the colour names the nutrient, never how the user is
+ * doing at it. See theme/accents.ts.
  */
 export function ResultCard({ finding, foods, onOpen }: Props) {
   const { nutrient, reason } = finding;
@@ -54,19 +58,19 @@ export function ResultCard({ finding, foods, onOpen }: Props) {
       onPress={onOpen}
       style={({ pressed }) => [
         styles.card,
-        { backgroundColor: accent.surface, borderColor: accent.border },
+        { borderLeftColor: accent.base },
         pressed && styles.pressed,
       ]}
     >
       <View style={styles.head}>
         <Text style={[styles.name, { color: accent.text }]}>{nutrient.name}</Text>
-        <Icon name="chevron-right" size={20} color={accent.text} />
+        <Icon name="chevron-right" size={20} color={colors.outline} />
       </View>
 
       <Text style={styles.summary}>{nutrient.summary}</Text>
 
       <View style={styles.reason}>
-        <Icon name="info-outline" size={16} color={accent.text} />
+        <Icon name="info-outline" size={16} color={colors.onSecondaryContainer} />
         <Text style={styles.reasonText}>{reason}</Text>
       </View>
 
@@ -75,12 +79,7 @@ export function ResultCard({ finding, foods, onOpen }: Props) {
           foods
             .slice(0, 3)
             .map((food) => (
-              <FoodChip
-                key={food.label}
-                label={food.label}
-                icon={food.icon}
-                accent={accent}
-              />
+              <FoodChip key={food.label} label={food.label} icon={food.icon} />
             ))
         ) : (
           // Every common source is excluded by what they told us in Q5. Saying
@@ -98,9 +97,13 @@ export function ResultCard({ finding, foods, onOpen }: Props) {
 
 const styles = StyleSheet.create({
   card: {
+    backgroundColor: colors.surfaceContainerLowest,
     borderRadius: radius.md,
     padding: spacing.cardPaddingSm,
     borderWidth: 1,
+    borderColor: colors.surfaceContainer,
+    // The identity colour, reduced to an edge.
+    borderLeftWidth: 4,
     gap: spacing.stackSm,
     shadowColor: '#435f8b',
     shadowOffset: { width: 0, height: 4 },
@@ -108,7 +111,7 @@ const styles = StyleSheet.create({
     shadowRadius: 12,
     elevation: 2,
   },
-  pressed: { opacity: 0.88 },
+  pressed: { backgroundColor: '#FCFDFF' },
   head: {
     flexDirection: 'row',
     alignItems: 'flex-start',
@@ -129,9 +132,7 @@ const styles = StyleSheet.create({
     gap: spacing.stackSm,
     padding: spacing.stackSm + spacing.base,
     borderRadius: radius.base,
-    // White rather than gold: the card behind is already tinted, and two washes
-    // stacked turned the reason - the most important line - into mud.
-    backgroundColor: 'rgba(255,255,255,0.75)',
+    backgroundColor: colors.tintGold,
   },
   reasonText: {
     ...typography.caption,

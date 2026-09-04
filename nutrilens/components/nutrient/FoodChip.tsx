@@ -5,7 +5,11 @@ import { Icon, type IconName } from '../ui/Icon';
 type Props = {
   label: string;
   icon: IconName;
-  /** Nutrient identity colour. Chips sit on a tinted card, so they go white. */
+  /**
+   * Kept for callers that want a tinted chip. Unused on Results, where the
+   * identity colour is carried by the card edge and heading instead — three
+   * coloured chips per card on top of that was too much.
+   */
   accent?: Accent;
 };
 
@@ -19,8 +23,8 @@ type Props = {
 export function FoodChip({ label, icon, accent = NEUTRAL_ACCENT }: Props) {
   return (
     <View style={styles.chip}>
-      <Icon name={icon} size={16} color={accent.text} />
-      <Text style={[styles.label, { color: accent.text }]}>{label}</Text>
+      <Icon name={icon} size={16} color={colors.onSurfaceVariant} />
+      <Text style={styles.label}>{label}</Text>
     </View>
   );
 }
@@ -33,10 +37,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.stackSm,
     paddingVertical: spacing.base,
     borderRadius: radius.full,
-    // White, because the card behind is already the accent's pale wash.
-    backgroundColor: colors.surfaceContainerLowest,
+    backgroundColor: colors.surfaceContainer,
   },
   label: {
     ...typography.caption,
+    color: colors.onSurfaceVariant,
   },
 });

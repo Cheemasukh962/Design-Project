@@ -4,6 +4,8 @@ import { Icon, type IconName } from '../../components/ui/Icon';
 import { Screen } from '../../components/ui/Screen';
 import { useQuiz } from '../../data/QuizContext';
 import { ACCOUNT, PROFILE, SEED_DEMO_ROUTINE } from '../../data/progress';
+import { useCompanion } from '../../data/CompanionContext';
+import { SPECIES } from '../../data/companion';
 import { useRoutine } from '../../data/RoutineContext';
 import { colors, radius, spacing, typography } from '../../theme';
 
@@ -22,6 +24,13 @@ import { colors, radius, spacing, typography } from '../../theme';
 export default function ProfileRoute() {
   const { reset } = useQuiz();
   const { added, items, done } = useRoutine();
+  const {
+    speciesId,
+    tokens,
+    stage,
+    reset: resetCompanion,
+  } = useCompanion();
+  const species = speciesId ? SPECIES[speciesId] : null;
 
   return (
     <Screen>
@@ -47,7 +56,9 @@ export default function ProfileRoute() {
           <Text style={styles.noticeText}>
             Sample profile. There are no accounts in this build, and nothing is
             saved when the app closes — including your quiz answers and anything
-            ticked off today.
+            ticked off today. Your buddy is the one exception: it is stored on
+            this device, because a care meter that resets every launch measures
+            nothing.
             {SEED_DEMO_ROUTINE
               ? ' The routine starts pre-filled with example items; the switch is SEED_DEMO_ROUTINE in data/progress.ts.'
               : ''}
@@ -77,6 +88,24 @@ export default function ProfileRoute() {
             label="How this works"
             detail="The rules behind your results"
           />
+          {species ? (
+            <Row
+              icon="undo"
+              label={`Start over with ${species.names[stage]}`}
+              detail={`Clears ${tokens} ${tokens === 1 ? 'token' : 'tokens'} and lets you pick again`}
+              onPress={() => {
+                resetCompanion();
+                router.push('/starter');
+              }}
+            />
+          ) : (
+            <Row
+              icon="person"
+              label="Pick your buddy"
+              detail="Three to choose from"
+              onPress={() => router.push('/starter')}
+            />
+          )}
           <Row
             icon="open-in-new"
             label="Not medical advice"

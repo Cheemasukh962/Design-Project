@@ -125,6 +125,76 @@ allergies" is the one answer we cannot act on — we never asked which ones and
 guessing would be dangerous — so it changes what we say rather than what we
 recommend.
 
+## The companion (prototype for review)
+
+A starter creature that grows from your routine. Reachable at `/starter`, shown
+on Home, full screen at `/companion`, and there is a design reference sheet of
+all nine forms at `/creatures`.
+
+**Grounded in two pieces of research.** Ken Sugimori describes the starter trio
+as a personality split — a cool one, a serious one, a funny one — not just an
+elemental one, and the studio's core rule is the silhouette test: fill the
+character solid black and it should still be recognisable. Both are implemented
+literally. The creatures are built only from circles and triangles, and the
+crest is what distinguishes the three species from across the room.
+
+**Nine forms from one skeleton.** `components/companion/Creature.tsx` is
+parameterised: stage sets the proportions, species sets the palette and crest.
+An evolution line has to read as one creature growing up, and drawing them from
+one skeleton makes that true by construction rather than by luck. It also
+scales, animates, recolours for free, and borrows nobody's IP — which
+hand-drawn or AI-generated art of a "Pokémon crossed with a Digimon" would not.
+
+**Colour is contained.** The game sits on a deep navy ground (`theme/companion.ts`).
+The health app is light and its colour language is strict — gold means "worth a
+look", green means "done", red is banned. Three saturated elemental hues would
+wreck that. So: dark ground means you are in the game and colour means type;
+light ground means you are in the health app. The two never share a surface.
+
+**Everything is earned.** One token per routine item actually ticked. No login
+bonus, no reward for opening the app, and re-ticking something already done does
+not pay twice. Stage 2 at 15 tokens, stage 3 at 50.
+
+### The one deliberate departure from the format
+
+**The creature cannot die, and never loses an evolution.** Care decays when
+ignored, floors at 20%, and one tick restores more than a day of decay.
+
+The Tamagotchi literature is clear that the attachment is inseparable from the
+guilt — owners "shoulder the guilty burden of knowing that they alone had been
+responsible for the death of their pet". Two reasons that guilt cannot come
+into this app:
+
+1. The PRD bans guilt mechanics outright.
+2. More seriously: the behaviour being reinforced is taking supplements. A
+   creature that starves unless you take a pill applies emotional pressure
+   toward daily supplementation, and fat-soluble vitamins like D accumulate.
+   This is the one place a game mechanic here could do real harm.
+
+What survives is the entire emotional hook — something depends on you, notices
+you, and brightens when you show up. What is removed is the punishment.
+`CARE.RECOVER`, `CARE.DECAY` and `CARE.FLOOR` in `data/companion.ts` are the
+three numbers to change if the team wants real stakes.
+
+### What this replaced
+
+Home used to carry an invented level, XP total, quest counter, "% filled" bars
+and buff chips. Once the companion started earning tokens from real ticks, Home
+had two progress systems stacked on each other — one honest, one fabricated,
+which makes the gamification impossible to judge. The invented layer is gone
+from Home; `NutrientProgressCard` and the values in `data/progress.ts` are still
+in the tree if you want it back.
+
+### Still open on the companion
+
+- **Persistence is now real.** The companion is the only thing in the app stored
+  on the device (`AsyncStorage`), because a care meter that resets each launch
+  measures nothing. Quiz answers and the routine still do not persist.
+- **3D was not attempted.** `expo-gl` plus a three.js renderer is a large
+  dependency for something the flat vector already does well at this size. The
+  `Creature` component is one file, so swapping it later changes nothing else.
+- **No sound, no haptics, no evolution animation** beyond the reveal overlay.
+
 ## Three things to decide before anyone tests this
 
 These are design calls, not bugs. Each is isolated to one place in the code.

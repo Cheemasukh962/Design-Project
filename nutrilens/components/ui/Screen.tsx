@@ -2,6 +2,7 @@ import type { ReactNode } from 'react';
 import { StyleSheet, View, type ViewStyle } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { colors, spacing } from '../../theme';
+import { companion } from '../../theme/companion';
 
 /**
  * The two page grounds used across the mocks.
@@ -10,8 +11,13 @@ import { colors, spacing } from '../../theme';
  * app proper: results, home, nutrient detail and the routine tracker all sit
  * on #f8f9ff. Keeping the split means the quiz reads as a distinct, finite
  * errand and arriving at results feels like entering the actual product.
+ *
+ * `night` is the companion world. It exists to contain the three elemental
+ * hues: on the dark ground colour means creature type, and on the light
+ * grounds colour means what it means everywhere else in the health app. The
+ * two never share a surface. See theme/companion.ts.
  */
-export type ScreenBackground = 'cream' | 'surface';
+export type ScreenBackground = 'cream' | 'surface' | 'night';
 
 type Props = {
   children: ReactNode;
@@ -44,7 +50,7 @@ export function Screen({
     <View
       style={[
         styles.root,
-        { backgroundColor: background === 'cream' ? colors.cream : colors.surface },
+        { backgroundColor: GROUNDS[background] },
         {
           paddingTop: edgeToEdgeTop ? 0 : insets.top,
           paddingBottom: insets.bottom,
@@ -58,6 +64,12 @@ export function Screen({
     </View>
   );
 }
+
+const GROUNDS: Record<ScreenBackground, string> = {
+  cream: colors.cream,
+  surface: colors.surface,
+  night: companion.night,
+};
 
 const styles = StyleSheet.create({
   root: {

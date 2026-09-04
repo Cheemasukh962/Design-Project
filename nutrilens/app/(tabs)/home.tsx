@@ -1,9 +1,10 @@
 import { router } from 'expo-router';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { ArticleCard } from '../../components/home/ArticleCard';
+import { CompanionCard } from '../../components/home/CompanionCard';
 import { GapSummaryCard } from '../../components/home/GapSummaryCard';
 import { HomeHeader } from '../../components/home/HomeHeader';
-import { NutrientProgressCard } from '../../components/home/NutrientProgressCard';
+import { NutrientShortcut } from '../../components/home/NutrientShortcut';
 import { RoutineTickRow } from '../../components/home/RoutineTickRow';
 import { Badge } from '../../components/ui/Badge';
 import { Icon } from '../../components/ui/Icon';
@@ -11,7 +12,7 @@ import { Screen } from '../../components/ui/Screen';
 import { useQuiz } from '../../data/QuizContext';
 import { DEMO_ANSWERS, hasAnswers, inferFindings } from '../../data/inference';
 import { NUTRIENTS } from '../../data/nutrients';
-import { ACCOUNT, ARTICLES, PROFILE, progressFor } from '../../data/progress';
+import { ARTICLES, PROFILE } from '../../data/progress';
 import { useRoutine } from '../../data/RoutineContext';
 import { colors, radius, spacing, typography } from '../../theme';
 
@@ -38,7 +39,7 @@ function greeting(hour: number): string {
 
 export default function HomeRoute() {
   const { answers } = useQuiz();
-  const { items, done, toggleDone } = useRoutine();
+  const { items, done, toggleDone, added } = useRoutine();
 
   const tookQuiz = hasAnswers(answers);
   const findings = inferFindings(tookQuiz ? answers : DEMO_ANSWERS);
@@ -62,6 +63,13 @@ export default function HomeRoute() {
         contentContainerStyle={styles.body}
         showsVerticalScrollIndicator={false}
       >
+        {/* First thing on the page: something that has been waiting for you
+            reads better on a return visit than a number you already know. */}
+        <CompanionCard
+          onOpen={() => router.push('/companion')}
+          onPick={() => router.push('/starter')}
+        />
+
         <GapSummaryCard
           label={`${findings.length} ${
             findings.length === 1 ? 'nutrient' : 'nutrients'
@@ -69,21 +77,13 @@ export default function HomeRoute() {
           onPress={() => router.push('/results')}
         />
 
-        {/* ---- Your nutrients ---- */}
+        {/* ---- Your nutrients ----
+            The mock put a level, an XP total and a quest counter here. All of
+            it was invented, and once the companion started earning tokens from
+            real ticks it was a second, fake progress system sitting a card
+            below a real one. The game lives in the companion now. */}
         <View style={styles.sectionHead}>
-          <View style={styles.headLeft}>
-            <Text style={styles.sectionTitle}>Your nutrients</Text>
-            <Badge
-              tone="blue"
-              icon="bolt"
-              label={`Lv.${ACCOUNT.level} · ${ACCOUNT.xp} XP`}
-            />
-          </View>
-          <Badge
-            tone="gold"
-            icon="verified"
-            label={`Quests ${ACCOUNT.questsDone}/${ACCOUNT.questsTotal}`}
-          />
+          <Text style={styles.sectionTitle}>Your nutrients</Text>
         </View>
 
         <ScrollView
@@ -93,10 +93,10 @@ export default function HomeRoute() {
           contentContainerStyle={styles.rail}
         >
           {nutrients.map((nutrient) => (
-            <NutrientProgressCard
+            <NutrientShortcut
               key={nutrient.id}
               nutrient={nutrient}
-              progress={progressFor(nutrient.id)}
+              inRoutine={added.includes(nutrient.id)}
               onPress={() =>
                 router.push({ pathname: '/nutrient/[id]', params: { id: nutrient.id } })
               }
