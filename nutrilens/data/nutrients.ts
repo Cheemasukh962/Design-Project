@@ -1,5 +1,5 @@
 import type { IconName } from '../components/ui/Icon';
-import { accents, NEUTRAL_ACCENT, type Accent, type AccentName } from '../theme';
+import type { PillShape } from '../components/nutrient/PillMark';
 
 export type FoodSource = {
   label: string;
@@ -51,10 +51,13 @@ export type Nutrient = {
   /** Letter mark shown in the rounded square. Icons are unreadable this small. */
   letter: string;
   /**
-   * This nutrient's permanent identity colour. See theme/accents.ts — it means
-   * the nutrient and never the status, so it does not change with progress.
+   * The pill silhouette used as this nutrient's mark.
+   *
+   * Shape, not colour. Five accent hues had crept into the health app and made
+   * it look like a paint chart; the palette is back to white and navy, and a
+   * capsule / tablet / softgel tells the marks apart inside it.
    */
-  accent: AccentName;
+  pill: PillShape;
   /** One plain sentence. No jargon, no hedging. */
   summary: string;
   /** The "Essential for" grid at the top of the detail page. */
@@ -82,7 +85,7 @@ export type Nutrient = {
 export const NUTRIENTS: Record<string, Nutrient> = {
   d: {
     id: 'd',
-    accent: 'gold',
+    pill: 'softgel',
     name: 'Vitamin D',
     letter: 'D',
     summary: 'Helps your body absorb calcium and supports your immune system.',
@@ -117,7 +120,7 @@ export const NUTRIENTS: Record<string, Nutrient> = {
   },
   b12: {
     id: 'b12',
-    accent: 'violet',
+    pill: 'capsule',
     name: 'Vitamin B12',
     letter: 'B12',
     summary: 'Supports nerve function and helps turn food into energy.',
@@ -144,7 +147,7 @@ export const NUTRIENTS: Record<string, Nutrient> = {
   },
   c: {
     id: 'c',
-    accent: 'orange',
+    pill: 'tablet',
     name: 'Vitamin C',
     letter: 'C',
     summary: 'An antioxidant that supports healing and iron absorption.',
@@ -171,7 +174,7 @@ export const NUTRIENTS: Record<string, Nutrient> = {
   },
   iron: {
     id: 'iron',
-    accent: 'bronze',
+    pill: 'capsule',
     name: 'Iron',
     letter: 'Fe',
     summary: 'Carries oxygen around your body; low iron shows up as fatigue.',
@@ -198,7 +201,7 @@ export const NUTRIENTS: Record<string, Nutrient> = {
   },
   calcium: {
     id: 'calcium',
-    accent: 'teal',
+    pill: 'tablet',
     name: 'Calcium',
     letter: 'Ca',
     summary: 'Builds and maintains bone, and your bones are still forming into your twenties.',
@@ -225,8 +228,8 @@ export const NUTRIENTS: Record<string, Nutrient> = {
   },
 };
 
-/** The identity colour for a nutrient id, falling back to the neutral blue. */
-export function accentFor(nutrientId: string): Accent {
-  const name = NUTRIENTS[nutrientId]?.accent;
-  return name ? accents[name] : NEUTRAL_ACCENT;
+
+/** The pill silhouette for a nutrient id. Defaults to a capsule. */
+export function pillFor(nutrientId: string): PillShape {
+  return NUTRIENTS[nutrientId]?.pill ?? 'capsule';
 }

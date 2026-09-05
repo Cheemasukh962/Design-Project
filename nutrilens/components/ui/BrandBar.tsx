@@ -1,49 +1,27 @@
-import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
-import { colors, radius, spacing, typography } from '../../theme';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { colors, radius, spacing } from '../../theme';
+import { Logo } from '../brand/Logo';
 import { Icon } from './Icon';
 
 type Props = {
-  /**
-   * `photo` — Vito's avatar in a 40px circle, as on Results.
-   * `glyph` — a 32px navy disc with the robot mark, as on the Routine tracker.
-   */
-  mark?: 'photo' | 'glyph';
   onNotifications?: () => void;
 };
 
 /**
  * The brand top bar used by Results and the Routine tracker.
  *
- * The two mocks draw it slightly differently — Results uses a 40px photo
- * avatar with the wordmark at 24px, Routine a 32px navy disc with the wordmark
- * at 22px. Both variants are kept rather than picked between, because the
- * difference reads as deliberate weighting: Results is the payoff screen and
- * carries the heavier mark.
+ * The logo replaced a mascot avatar plus a text wordmark. Two marks competing
+ * in one corner is one too many, and the mascot was doing no work here — it
+ * carried no state and said nothing, which is exactly the test for whether a
+ * mascot appearance is earned.
  *
- * The bell is decorative for now — there is no notification system. It routes
- * nowhere and says so to a screen reader rather than pretending.
+ * The bell is decorative for now — there is no notification system yet, and it
+ * says so to a screen reader rather than pretending.
  */
-export function BrandBar({ mark = 'photo', onNotifications }: Props) {
-  const isPhoto = mark === 'photo';
-
+export function BrandBar({ onNotifications }: Props) {
   return (
     <View style={styles.bar}>
-      <View style={styles.left}>
-        {isPhoto ? (
-          <Image
-            source={require('../../assets/brand/vito-avatar.png')}
-            style={styles.photo}
-            resizeMode="cover"
-            accessibilityElementsHidden
-            importantForAccessibility="no-hide-descendants"
-          />
-        ) : (
-          <View style={styles.glyph}>
-            <Icon name="smart-toy" size={18} color={colors.secondaryFixed} />
-          </View>
-        )}
-        <Text style={isPhoto ? styles.wordmarkLg : styles.wordmarkSm}>NutriLens</Text>
-      </View>
+      <Logo size={30} />
 
       <Pressable
         accessibilityRole="button"
@@ -64,34 +42,6 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingVertical: spacing.stackSm,
   },
-  left: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.stackSm,
-  },
-  photo: {
-    width: 40,
-    height: 40,
-    borderRadius: radius.full,
-    backgroundColor: colors.surfaceContainerHigh,
-  },
-  glyph: {
-    width: 32,
-    height: 32,
-    borderRadius: radius.full,
-    backgroundColor: colors.aggieBlue,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  wordmarkLg: {
-    ...typography.h1Mobile,
-    color: colors.primary,
-  },
-  wordmarkSm: {
-    ...typography.h2,
-    fontFamily: typography.h1Mobile.fontFamily,
-    color: colors.primary,
-  },
   bell: {
     width: 40,
     height: 40,
@@ -100,7 +50,5 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     marginRight: -spacing.stackSm,
   },
-  pressed: {
-    backgroundColor: colors.surfaceContainerLow,
-  },
+  pressed: { backgroundColor: colors.surfaceContainerLow },
 });

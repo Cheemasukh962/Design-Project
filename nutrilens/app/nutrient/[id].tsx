@@ -2,13 +2,14 @@ import { router, useLocalSearchParams } from 'expo-router';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { BenefitChip } from '../../components/nutrient/BenefitChip';
 import { PerspectiveCard } from '../../components/nutrient/PerspectiveCard';
+import { PillMark } from '../../components/nutrient/PillMark';
 import { SourceCard } from '../../components/nutrient/SourceCard';
 import { Accordion } from '../../components/ui/Accordion';
 import { AppBar } from '../../components/ui/AppBar';
 import { Button } from '../../components/ui/Button';
 import { Icon } from '../../components/ui/Icon';
 import { Screen } from '../../components/ui/Screen';
-import { NUTRIENTS, accentFor } from '../../data/nutrients';
+import { NUTRIENTS, pillFor } from '../../data/nutrients';
 import { useQuiz } from '../../data/QuizContext';
 import { applyRestrictions } from '../../data/restrictions';
 import { useRoutine } from '../../data/RoutineContext';
@@ -29,7 +30,7 @@ import { colors, radius, spacing, typography } from '../../theme';
  */
 export default function NutrientDetailRoute() {
   const { id } = useLocalSearchParams<{ id: string }>();
-  const { added, add } = useRoutine();
+  const { added, add, items, reminders, reminderTime, toggleReminder } = useRoutine();
   const { answers } = useQuiz();
 
   const nutrient = NUTRIENTS[id ?? ''];
@@ -44,9 +45,11 @@ export default function NutrientDetailRoute() {
   }
 
   const inRoutine = added.includes(nutrient.id);
+  // Every routine item this nutrient expanded into.
+  const mine = items.filter((i) => i.nutrientId === nutrient.id);
+  const remindOn = mine.length > 0 && mine.every((i) => reminders.includes(i.id));
   // Never show a source the user told us in Q5 that they do not eat.
   const foods = applyRestrictions(nutrient.foods, answers.restrictions);
-  const accent = accentFor(nutrient.id);
 
   return (
     <Screen padded={false}>
@@ -75,10 +78,10 @@ export default function NutrientDetailRoute() {
               A tinted plate carrying the nutrient's own mark fills the frame
               deliberately instead of showing an empty image box — and a real
               photo drops into the same frame with no layout change. */}
-          <View style={[styles.heroPlate, { backgroundColor: accent.surface }]}>
-            <Text style={[styles.heroMark, { color: accent.base }]}>
-              {nutrient.letter}
-            </Text>
+          {/* The pill itself, turning. It replaces the letter placeholder and
+              is the one moment of motion on an otherwise still page. */}
+          <View style={styles.heroPlate}>
+            <PillMark shape={pillFor(nutrient.id)} size={196} spin />
           </View>
         </View>
 
@@ -95,7 +98,7 @@ export default function NutrientDetailRoute() {
           contentContainerStyle={styles.rail}
         >
           {foods.map((source) => (
-            <SourceCard key={source.label} source={source} accent={accent} />
+            <SourceCard key={source.label} source={source} />
           ))}
         </ScrollView>
 
@@ -166,6 +169,37 @@ export default function NutrientDetailRoute() {
 
       {/* ---- Sticky CTA ---- */}
       <View style={styles.cta}>
+        {/* The reminder offer appears the moment something is added, because
+            that is the only moment the user is thinking about it. Buried in a
+            settings screen it would never be found, and forgetting is the
+            failure this whole product has to survive. */}
+        {inRoutine && (
+          <Pressable
+            accessibilityRole="switch"
+            accessibilityState={{ checked: remindOn }}
+            accessibilityLabel={
+              remindOn
+                ? `Daily reminder on at ${reminderTime}. Tap to turn off.`
+                : `Remind me daily about ${nutrient.name}`
+            }
+            onPress={() => mine.forEach((i) => toggleReminder(i.id))}
+            style={({ pressed }) => [
+              styles.remind,
+              remindOn && styles.remindOn,
+              pressed && { opacity: 0.9 },
+            ]}
+          >
+            <Icon
+              name={remindOn ? 'notifications-active' : 'notifications-none'}
+              size={20}
+              color={remindOn ? colors.onPrimary : colors.aggieBlue}
+            />
+            <Text style={[styles.remindLabel, remindOn && { color: colors.onPrimary }]}>
+              {remindOn ? `Reminder set for ${reminderTime}` : 'Remind me daily'}
+            </Text>
+          </Pressable>
+        )}
+
         <Button
           label={inRoutine ? 'In your routine' : 'Add to my routine'}
           variant={inRoutine ? 'outline' : 'primary'}
@@ -220,17 +254,11 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
   },
   heroPlate: {
-    height: 128,
+    height: 196,
     width: '100%',
     borderRadius: radius.base,
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  heroMark: {
-    fontFamily: typography.display.fontFamily,
-    fontSize: 56,
-    lineHeight: 64,
-    letterSpacing: -1.2,
   },
   sectionHead: {
     flexDirection: 'row',
@@ -335,6 +363,27 @@ const styles = StyleSheet.create({
     ...typography.bodyMd,
     color: colors.onSurfaceVariant,
     marginTop: spacing.stackLg,
+  },
+  remind: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: spacing.stackSm,
+    height: 48,
+    borderRadius: radius.md,
+    borderWidth: 1.5,
+    borderColor: colors.aggieBlue,
+    marginBottom: spacing.stackSm,
+  },
+  remindOn: {
+    backgroundColor: colors.aggieBlue,
+    borderColor: colors.aggieBlue,
+  },
+  remindLabel: {
+    ...typography.bodyMd,
+    fontFamily: typography.h3.fontFamily,
+    fontSize: 15,
+    color: colors.aggieBlue,
   },
   cta: {
     paddingHorizontal: spacing.screenMargin,

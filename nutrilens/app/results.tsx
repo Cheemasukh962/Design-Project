@@ -1,12 +1,14 @@
 import { router } from 'expo-router';
 import { useMemo, useState } from 'react';
-import { Image, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Creature } from '../components/companion/Creature';
 import { ResultCard } from '../components/results/ResultCard';
 import { BrandBar } from '../components/ui/BrandBar';
 import { Icon } from '../components/ui/Icon';
 import { Button } from '../components/ui/Button';
 import { Screen } from '../components/ui/Screen';
 import { Toast } from '../components/ui/Toast';
+import { useCompanion } from '../data/CompanionContext';
 import { useQuiz } from '../data/QuizContext';
 import { DEMO_ANSWERS, hasAnswers, inferFindings } from '../data/inference';
 import { ALLERGY_CAVEAT, applyRestrictions, hasAllergyFlag } from '../data/restrictions';
@@ -37,6 +39,7 @@ import { colors, radius, spacing, typography } from '../theme';
 export default function ResultsRoute() {
   const { answers } = useQuiz();
   const { added, add, remove } = useRoutine();
+  const { speciesId, stage } = useCompanion();
   const [toast, setToast] = useState<{ ids: string[]; label: string } | null>(null);
 
   // Someone can arrive here without taking the quiz — from Home, or a deep
@@ -71,7 +74,7 @@ export default function ResultsRoute() {
 
   return (
     <Screen>
-      <BrandBar mark="photo" />
+      <BrandBar />
 
       <ScrollView contentContainerStyle={styles.body} showsVerticalScrollIndicator={false}>
         <Text style={styles.headline} accessibilityRole="header">
@@ -79,13 +82,11 @@ export default function ResultsRoute() {
         </Text>
 
         <View style={styles.summary}>
-          <Image
-            source={require('../assets/brand/vito-avatar.png')}
-            style={styles.summaryAvatar}
-            resizeMode="cover"
-            accessibilityElementsHidden
-            importantForAccessibility="no-hide-descendants"
-          />
+          {/* The pal the user just picked, not a generic mascot — it is the
+              first thing it does after being chosen. */}
+          {speciesId && (
+            <Creature species={speciesId} stage={stage} size={64} glow={false} />
+          )}
           <View style={styles.summaryText}>
             <Text style={styles.summaryLead}>Based on your answers,</Text>
             <Text style={styles.summaryBody}>
@@ -179,14 +180,6 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.06,
     shadowRadius: 12,
     elevation: 2,
-  },
-  summaryAvatar: {
-    width: 48,
-    height: 48,
-    borderRadius: radius.full,
-    borderWidth: 2,
-    borderColor: colors.surfaceContainerLowest,
-    backgroundColor: colors.surfaceContainerLowest,
   },
   summaryText: { flex: 1, gap: spacing.base },
   summaryLead: {

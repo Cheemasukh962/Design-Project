@@ -53,11 +53,10 @@ export type NutrientProgress = {
 };
 
 /**
- * NOTE — the accent field that used to live here is gone. Colour on the Home
- * cards used to encode how "full" a nutrient was, which is what put a red on
- * Vitamin B12 at 50% and broke the guardrail against red for a nutrition
- * state. Colour is now the nutrient's permanent identity (theme/accents.ts)
- * and quantity lives on the progress bar, where a quantity belongs.
+ * NOTE — colour is no longer part of this. The Home cards used to be tinted by
+ * how "full" a nutrient was, which put a red on B12 at 50% and broke the
+ * guardrail against red for a nutrition state. The health app is white and navy
+ * now, and nutrients are told apart by pill shape.
  */
 
 /**
@@ -159,7 +158,11 @@ export const SEED_DONE = ['d-0', 'd-1', 'd-2'];
  *   (c) cut the row.
  */
 export const ROUTINE_TIP = {
-  attribution: "Vito's tip:",
+  // Was "Vito's tip". Vito has been removed from the product, so the line can
+  // no longer be attributed to him — and attributing a health claim to a
+  // cartoon was half of what made it a guardrail problem in the first place.
+  // The figure is still uncited; that half is unchanged.
+  attribution: 'Worth knowing:',
   body: 'Taking Vitamin D with a fat source aids absorption by 32%.',
   /** Set this and the claim becomes defensible. */
   citation: null as string | null,

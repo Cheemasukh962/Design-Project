@@ -42,7 +42,8 @@ function weekDates(today: Date): number[] {
 }
 
 export default function RoutineRoute() {
-  const { items, done, toggleDone } = useRoutine();
+  const { items, done, toggleDone, reminders, reminderTime, toggleReminder, remindAll } =
+    useRoutine();
   const [filter, setFilter] = useState<RoutineFilter>('all');
 
   const today = useMemo(() => new Date(), []);
@@ -56,10 +57,11 @@ export default function RoutineRoute() {
   const visible = filter === 'all' ? items : items.filter((i) => i.type === filter);
   const doneCount = items.filter((i) => done.includes(i.id)).length;
   const remaining = items.length - doneCount;
+  const allRemind = items.length > 0 && reminders.length === items.length;
 
   return (
     <Screen>
-      <BrandBar mark="glyph" />
+      <BrandBar />
 
       <ScrollView contentContainerStyle={styles.body} showsVerticalScrollIndicator={false}>
         {/* ---- Date and streak ---- */}
@@ -117,6 +119,46 @@ export default function RoutineRoute() {
           </View>
         </View>
 
+        {/* ---- Reminders ----
+            Forgetting is the failure this screen exists to prevent, so the
+            control sits above the list instead of inside a settings page. */}
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel={
+            allRemind
+              ? `Daily reminders on for all ${items.length} items at ${reminderTime}`
+              : 'Turn on a daily reminder for everything'
+          }
+          onPress={remindAll}
+          disabled={items.length === 0 || allRemind}
+          style={({ pressed }) => [
+            styles.notify,
+            allRemind && styles.notifyOn,
+            pressed && { opacity: 0.9 },
+            items.length === 0 && { opacity: 0.45 },
+          ]}
+        >
+          <Icon
+            name={reminders.length > 0 ? 'notifications-active' : 'notifications-none'}
+            size={22}
+            color={allRemind ? colors.onPrimary : colors.aggieBlue}
+          />
+          <View style={styles.notifyText}>
+            <Text style={[styles.notifyTitle, allRemind && { color: colors.onPrimary }]}>
+              {reminders.length === 0
+                ? 'Remind me daily'
+                : allRemind
+                  ? `All set for ${reminderTime}`
+                  : `${reminders.length} of ${items.length} have reminders`}
+            </Text>
+            <Text style={[styles.notifySub, allRemind && { color: colors.primaryFixed }]}>
+              {allRemind
+                ? 'Tap a bell on any item to turn that one off'
+                : `One nudge at ${reminderTime}, so you do not have to remember`}
+            </Text>
+          </View>
+        </Pressable>
+
         {/* ---- Checklist ---- */}
         <View style={styles.block}>
           <FilterPills value={filter} onChange={setFilter} total={items.length} />
@@ -130,6 +172,8 @@ export default function RoutineRoute() {
                 item={item}
                 done={done.includes(item.id)}
                 onToggle={() => toggleDone(item.id)}
+                reminderOn={reminders.includes(item.id)}
+                onToggleReminder={() => toggleReminder(item.id)}
               />
             ))
           ) : (
@@ -248,6 +292,32 @@ const styles = StyleSheet.create({
   },
   tipAttribution: {
     color: colors.primary,
+  },
+  notify: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.base * 3,
+    marginTop: spacing.stackMd,
+    padding: spacing.cardPaddingSm,
+    borderRadius: radius.md,
+    backgroundColor: colors.surfaceContainerLowest,
+    borderWidth: 1.5,
+    borderColor: colors.aggieBlue,
+  },
+  notifyOn: {
+    backgroundColor: colors.aggieBlue,
+    borderColor: colors.aggieBlue,
+  },
+  notifyText: { flex: 1 },
+  notifyTitle: {
+    ...typography.bodyMd,
+    fontFamily: typography.h3.fontFamily,
+    fontSize: 15,
+    color: colors.aggieBlue,
+  },
+  notifySub: {
+    ...typography.caption,
+    color: colors.onSurfaceVariant,
   },
   list: {
     gap: 10,

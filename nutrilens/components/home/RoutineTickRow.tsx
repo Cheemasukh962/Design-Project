@@ -7,6 +7,8 @@ type Props = {
   detail: string;
   done: boolean;
   onToggle: () => void;
+  /** Shows a quiet bell so the reminder state is visible without leaving Home. */
+  reminderOn?: boolean;
 };
 
 /**
@@ -18,7 +20,7 @@ type Props = {
  * arm's length. That is the PRD's one hard requirement for this screen: the
  * commonest daily action must be one tap from a cold open.
  */
-export function RoutineTickRow({ title, detail, done, onToggle }: Props) {
+export function RoutineTickRow({ title, detail, done, onToggle, reminderOn }: Props) {
   return (
     <Pressable
       accessibilityRole="checkbox"
@@ -35,6 +37,10 @@ export function RoutineTickRow({ title, detail, done, onToggle }: Props) {
         <Text style={[styles.title, done && styles.muted]}>{title}</Text>
         <Text style={[styles.detail, done && styles.muted]}>{detail}</Text>
       </View>
+
+      {reminderOn && (
+        <Icon name="notifications-active" size={16} color={colors.aggieBlue} />
+      )}
     </Pressable>
   );
 }

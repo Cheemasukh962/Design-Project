@@ -1,5 +1,15 @@
 import { router } from 'expo-router';
-import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { useState } from 'react';
+import {
+  LayoutAnimation,
+  Platform,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  UIManager,
+  View,
+} from 'react-native';
 import { ArticleCard } from '../../components/home/ArticleCard';
 import { CompanionCard } from '../../components/home/CompanionCard';
 import { GapSummaryCard } from '../../components/home/GapSummaryCard';
@@ -31,6 +41,10 @@ import { colors, radius, spacing, typography } from '../../theme';
  * quiz, and the routine sits inline so ticking an item is one tap from a cold
  * open. That last point is the PRD's only hard requirement for Home.
  */
+if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
+  UIManager.setLayoutAnimationEnabledExperimental(true);
+}
+
 function greeting(hour: number): string {
   if (hour < 12) return 'Good morning';
   if (hour < 17) return 'Good afternoon';
@@ -39,7 +53,9 @@ function greeting(hour: number): string {
 
 export default function HomeRoute() {
   const { answers } = useQuiz();
-  const { items, done, toggleDone, added } = useRoutine();
+  const { items, done, toggleDone, added, reminders } = useRoutine();
+  const [routineOpen, setRoutineOpen] = useState(false);
+  const doneToday = items.filter((i) => done.includes(i.id)).length;
 
   const tookQuiz = hasAnswers(answers);
   const findings = inferFindings(tookQuiz ? answers : DEMO_ANSWERS);
@@ -115,33 +131,59 @@ export default function HomeRoute() {
           <Icon name="arrow-forward" size={20} color={colors.onPrimary} />
         </Pressable>
 
-        {/* ---- Today's routine ---- */}
+        {/* ---- Today's routine ----
+            Collapsed by default. Expanded it was the tallest thing on Home and
+            pushed everything below it off-screen; the header alone already
+            answers the question most people open the app with, which is
+            "how much is left today?". */}
         <View style={styles.routineCard}>
-          <View style={styles.routineHead}>
+          <Pressable
+            accessibilityRole="button"
+            accessibilityState={{ expanded: routineOpen }}
+            accessibilityLabel={`Today's routine, ${doneToday} of ${items.length} done. ${
+              routineOpen ? 'Collapse' : 'Expand'
+            }`}
+            onPress={() => {
+              LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+              setRoutineOpen((o) => !o);
+            }}
+            style={styles.routineHead}
+          >
             <Text style={styles.cardTitle}>Today&apos;s routine</Text>
-            <Badge
-              tone="neutral"
-              label={`${items.length} ${items.length === 1 ? 'item' : 'items'}`}
-            />
-          </View>
-
-          {items.length > 0 ? (
-            <View style={styles.routineList}>
-              {items.slice(0, 3).map((item) => (
-                <RoutineTickRow
-                  key={item.id}
-                  title={item.title}
-                  detail={item.detail}
-                  done={done.includes(item.id)}
-                  onToggle={() => toggleDone(item.id)}
-                />
-              ))}
+            <View style={styles.routineHeadRight}>
+              <Badge
+                tone="neutral"
+                label={
+                  items.length === 0
+                    ? 'Empty'
+                    : `${doneToday}/${items.length} done`
+                }
+              />
+              <View style={routineOpen ? styles.chevronOpen : undefined}>
+                <Icon name="expand-more" size={22} color={colors.onSurfaceVariant} />
+              </View>
             </View>
-          ) : (
-            <Text style={styles.empty}>
-              Nothing added yet. Your results are where this fills up.
-            </Text>
-          )}
+          </Pressable>
+
+          {routineOpen &&
+            (items.length > 0 ? (
+              <View style={styles.routineList}>
+                {items.map((item) => (
+                  <RoutineTickRow
+                    key={item.id}
+                    title={item.title}
+                    detail={item.detail}
+                    done={done.includes(item.id)}
+                    reminderOn={reminders.includes(item.id)}
+                    onToggle={() => toggleDone(item.id)}
+                  />
+                ))}
+              </View>
+            ) : (
+              <Text style={styles.empty}>
+                Nothing added yet. Your results are where this fills up.
+              </Text>
+            ))}
         </View>
 
         {/* ---- Learn more ---- */}
@@ -231,13 +273,19 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginBottom: spacing.stackMd,
+    minHeight: 44,
   },
+  routineHeadRight: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.stackSm,
+  },
+  chevronOpen: { transform: [{ rotate: '180deg' }] },
   cardTitle: {
     ...typography.h3,
     color: colors.aggieBlue,
   },
-  routineList: { gap: 14 },
+  routineList: { gap: 14, marginTop: spacing.stackMd },
   empty: {
     ...typography.bodyMd,
     color: colors.onSurfaceVariant,

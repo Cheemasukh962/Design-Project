@@ -1,9 +1,9 @@
 import { router } from 'expo-router';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
-import { LetterMark } from '../../components/nutrient/LetterMark';
+import { PillMark } from '../../components/nutrient/PillMark';
 import { Icon } from '../../components/ui/Icon';
 import { Screen } from '../../components/ui/Screen';
-import { NUTRIENTS, accentFor } from '../../data/nutrients';
+import { NUTRIENTS, pillFor } from '../../data/nutrients';
 import { ARTICLES } from '../../data/progress';
 import { colors, radius, spacing, typography } from '../../theme';
 
@@ -60,11 +60,7 @@ export default function DiscoverRoute() {
               }
               style={({ pressed }) => [styles.row, pressed && styles.pressed]}
             >
-              <LetterMark
-                letter={nutrient.letter}
-                size={40}
-                accent={accentFor(nutrient.id)}
-              />
+              <PillMark shape={pillFor(nutrient.id)} size={44} />
               <View style={styles.rowText}>
                 <Text style={styles.rowTitle}>{nutrient.name}</Text>
                 <Text style={styles.rowBody} numberOfLines={2}>

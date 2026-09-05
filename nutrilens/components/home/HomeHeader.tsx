@@ -1,7 +1,8 @@
 import { LinearGradient } from 'expo-linear-gradient';
-import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 import Svg, { Circle, Path } from 'react-native-svg';
 import { colors, radius, spacing, typography } from '../../theme';
+import { Logo } from '../brand/Logo';
 
 type Props = {
   greeting: string;
@@ -19,9 +20,12 @@ type Props = {
  * a real blur would need expo-blur and an extra native module for two shapes
  * nobody will look at directly.
  *
- * NOTE: the mock places a bitmap logo here (a temporary Stitch CDN URL). We do
- * not have that asset, so the wordmark is set in type next to Vito's avatar.
- * Drop a real logo in and it replaces the two elements in `brand` below.
+ * The top row is the logo on the left and the profile on the right, with the
+ * greeting on its own line underneath. It previously carried a mascot avatar
+ * AND a text wordmark on the left, which put two competing marks in one corner
+ * next to a third circular element on the right — three focal points across
+ * 393px. The logo is the mark now, and the greeting gets its own line rather
+ * than fighting for the same one.
  */
 export function HomeHeader({ greeting, name, initial, onProfile }: Props) {
   return (
@@ -59,16 +63,7 @@ export function HomeHeader({ greeting, name, initial, onProfile }: Props) {
       </View>
 
       <View style={styles.row}>
-        <View style={styles.brand}>
-          <Image
-            source={require('../../assets/brand/vito-avatar.png')}
-            style={styles.mark}
-            resizeMode="cover"
-            accessibilityElementsHidden
-            importantForAccessibility="no-hide-descendants"
-          />
-          <Text style={styles.wordmark}>NutriLens</Text>
-        </View>
+        <Logo size={30} />
 
         <Pressable
           accessibilityRole="button"
@@ -134,21 +129,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-  },
-  brand: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.stackSm,
-  },
-  mark: {
-    width: 36,
-    height: 36,
-    borderRadius: radius.full,
-    backgroundColor: colors.surfaceContainerLow,
-  },
-  wordmark: {
-    ...typography.h1Mobile,
-    color: colors.aggieBlue,
   },
   avatarRing: {
     width: 36,

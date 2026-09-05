@@ -1,27 +1,26 @@
-import { Image, StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 import { colors, radius, spacing, typography } from '../../theme';
+import { Icon } from '../ui/Icon';
 
 type Props = {
   label: string;
 };
 
 /**
- * Small Vito pill above the question ("Let's get to know you").
+ * The small pill above a quiz question ("Let's get to know you").
  *
- * The mascot carries tone here and nothing else — the chip never states a
- * finding, and removing it would cost no information. That is the test for
- * whether a mascot appearance is allowed.
+ * It used to carry a mascot avatar. That is wrong here for a concrete reason:
+ * the pal is chosen *after* the quiz, so any creature shown during it belongs
+ * to nobody — and showing one the user has not picked undercuts the choice they
+ * are about to make.
+ *
+ * The chip carries tone and nothing else. Removing it would cost no
+ * information, which is the test for whether it is allowed to exist.
  */
 export function MascotChip({ label }: Props) {
   return (
     <View style={styles.chip}>
-      <Image
-        source={require('../../assets/brand/vito-avatar.png')}
-        style={styles.avatar}
-        resizeMode="cover"
-        accessibilityElementsHidden
-        importantForAccessibility="no-hide-descendants"
-      />
+      <Icon name="auto-awesome" size={16} color={colors.aggieBlue} />
       <Text style={styles.label}>{label}</Text>
     </View>
   );
@@ -32,27 +31,13 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     alignSelf: 'flex-start',
-    gap: spacing.stackSm,
-    paddingLeft: 6,
-    paddingRight: spacing.base * 3,
-    paddingVertical: spacing.base,
+    gap: 6,
+    paddingHorizontal: spacing.base * 3,
+    paddingVertical: 6,
     borderRadius: radius.full,
     backgroundColor: colors.surfaceContainerLowest,
     borderWidth: 1,
-    borderColor: '#E8EBEF',
-    shadowColor: '#022851',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.04,
-    shadowRadius: 8,
-    elevation: 1,
-  },
-  avatar: {
-    width: 28,
-    height: 28,
-    borderRadius: radius.full,
-    borderWidth: 1,
-    borderColor: '#E8EBEF',
-    backgroundColor: colors.surfaceContainerLow,
+    borderColor: colors.hairline,
   },
   label: {
     ...typography.caption,

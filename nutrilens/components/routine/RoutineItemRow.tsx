@@ -7,6 +7,8 @@ type Props = {
   item: RoutineItem;
   done: boolean;
   onToggle: () => void;
+  reminderOn?: boolean;
+  onToggleReminder?: () => void;
 };
 
 const TYPE_LABEL: Record<RoutineItemType, string> = {
@@ -42,7 +44,13 @@ const TYPE_CHIP: Record<RoutineItemType, { bg: string; fg: string }> = {
  * a defensible one: the button names the verb, and the checkbox is the faster
  * repeat gesture once you know where it is.
  */
-export function RoutineItemRow({ item, done, onToggle }: Props) {
+export function RoutineItemRow({
+  item,
+  done,
+  onToggle,
+  reminderOn = false,
+  onToggleReminder,
+}: Props) {
   const chip = TYPE_CHIP[item.type];
 
   return (
@@ -75,6 +83,30 @@ export function RoutineItemRow({ item, done, onToggle }: Props) {
             </View>
           </View>
         </View>
+      </Pressable>
+
+      {/* The reminder sits on every row, done or not - the point of a reminder
+          is tomorrow, not today. */}
+      <Pressable
+        accessibilityRole="switch"
+        accessibilityState={{ checked: reminderOn }}
+        accessibilityLabel={
+          reminderOn
+            ? `Daily reminder on for ${item.title}. Tap to turn it off.`
+            : `Remind me daily about ${item.title}`
+        }
+        onPress={onToggleReminder}
+        style={({ pressed }) => [
+          styles.bell,
+          reminderOn && styles.bellOn,
+          pressed && styles.morePressed,
+        ]}
+      >
+        <Icon
+          name={reminderOn ? 'notifications-active' : 'notifications-none'}
+          size={18}
+          color={reminderOn ? colors.onPrimary : colors.outline}
+        />
       </Pressable>
 
       {done ? (
@@ -173,6 +205,19 @@ const styles = StyleSheet.create({
   chipText: {
     ...typography.micro,
     letterSpacing: 0,
+  },
+  bell: {
+    width: 32,
+    height: 32,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: radius.full,
+    borderWidth: 1,
+    borderColor: colors.outlineVariant,
+  },
+  bellOn: {
+    backgroundColor: colors.aggieBlue,
+    borderColor: colors.aggieBlue,
   },
   more: {
     width: 32,

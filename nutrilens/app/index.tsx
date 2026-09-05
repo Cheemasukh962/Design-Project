@@ -1,6 +1,7 @@
 import { router } from 'expo-router';
 import { StyleSheet, Text, View } from 'react-native';
-import { VitoMascot } from '../components/brand/VitoMascot';
+import { Creature } from '../components/companion/Creature';
+import { Logo } from '../components/brand/Logo';
 import { FoldText } from '../components/splash/FoldText';
 import { Button } from '../components/ui/Button';
 import { FooterLinks } from '../components/ui/FooterLinks';
@@ -20,12 +21,15 @@ import { colors, spacing, typography } from '../theme';
 export default function SplashRoute() {
   return (
     <Screen>
-      {/* Mascot occupies the top ~45% and is the first thing to move. */}
+      {/* A fully grown pal, not the old mascot. The splash is the one place to
+          show what the thing becomes rather than what it starts as — the final
+          form is the promise, and it is the strongest silhouette we have. */}
       <View style={styles.mascotArea}>
-        <VitoMascot pose="idle" size={200} float />
+        <Creature species="ember" stage={2} size={260} glow animate />
       </View>
 
       <View style={styles.content}>
+        <Logo size={34} style={styles.logo} />
         <FoldText style={styles.headline}>Improve your journey</FoldText>
 
         <Text style={styles.subhead}>Find the gaps in your diet in 60 seconds.</Text>
@@ -58,6 +62,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  logo: { marginBottom: spacing.stackMd },
   content: {
     flex: 1,
     alignItems: 'center',

@@ -1,9 +1,10 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import type { Finding } from '../../data/inference';
-import { accentFor, type FoodSource } from '../../data/nutrients';
+import { pillFor, type FoodSource } from '../../data/nutrients';
 import { colors, radius, spacing, typography } from '../../theme';
 import { FoodChip } from '../nutrient/FoodChip';
 import { Icon } from '../ui/Icon';
+import { PillMark } from '../nutrient/PillMark';
 
 type Props = {
   finding: Finding;
@@ -36,34 +37,24 @@ type Props = {
  * Note what is still absent: no percentage, no meter, no confidence score.
  * Nothing was measured, so nothing here may look measured.
  *
- * COLOUR, AND HOW MUCH OF IT. The mock draws every card white on a near-white
- * page, which made three results read as one grey wall. The first fix washed
- * the whole card in the nutrient's identity colour, which was too loud — and
- * became louder still once the companion introduced three elemental hues of its
- * own. So the identity now shows as a 4px edge and the heading, on a white
- * card: enough to tell three results apart at a glance, quiet enough that the
- * page still reads as a health app rather than a paint chart.
- *
- * The rule is unchanged — the colour names the nutrient, never how the user is
- * doing at it. See theme/accents.ts.
+ * The mark is a pill, not a letter, and the card is white with a navy heading.
+ * Colour was doing identity work here — a wash, then an edge, in one of five
+ * hues — and it made the page look like a paint chart. Shape carries it now:
+ * capsule, tablet or softgel. See components/nutrient/PillMark.
  */
 export function ResultCard({ finding, foods, onOpen }: Props) {
   const { nutrient, reason } = finding;
-  const accent = accentFor(nutrient.id);
 
   return (
     <Pressable
       accessibilityRole="button"
       accessibilityLabel={`${nutrient.name}. ${nutrient.summary} ${reason}`}
       onPress={onOpen}
-      style={({ pressed }) => [
-        styles.card,
-        { borderLeftColor: accent.base },
-        pressed && styles.pressed,
-      ]}
+      style={({ pressed }) => [styles.card, pressed && styles.pressed]}
     >
       <View style={styles.head}>
-        <Text style={[styles.name, { color: accent.text }]}>{nutrient.name}</Text>
+        <PillMark shape={pillFor(nutrient.id)} size={44} />
+        <Text style={styles.name}>{nutrient.name}</Text>
         <Icon name="chevron-right" size={20} color={colors.outline} />
       </View>
 
@@ -102,8 +93,6 @@ const styles = StyleSheet.create({
     padding: spacing.cardPaddingSm,
     borderWidth: 1,
     borderColor: colors.surfaceContainer,
-    // The identity colour, reduced to an edge.
-    borderLeftWidth: 4,
     gap: spacing.stackSm,
     shadowColor: '#435f8b',
     shadowOffset: { width: 0, height: 4 },
@@ -114,12 +103,12 @@ const styles = StyleSheet.create({
   pressed: { backgroundColor: '#FCFDFF' },
   head: {
     flexDirection: 'row',
-    alignItems: 'flex-start',
-    justifyContent: 'space-between',
+    alignItems: 'center',
     gap: spacing.stackSm,
   },
   name: {
     ...typography.h2,
+    color: colors.aggieBlue,
     flex: 1,
   },
   summary: {

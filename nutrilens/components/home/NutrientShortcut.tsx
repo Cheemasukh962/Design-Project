@@ -1,8 +1,8 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
-import { accentFor, type Nutrient } from '../../data/nutrients';
+import { pillFor, type Nutrient } from '../../data/nutrients';
 import { colors, radius, spacing, typography } from '../../theme';
 import { Icon } from '../ui/Icon';
-import { LetterMark } from '../nutrient/LetterMark';
+import { PillMark } from '../nutrient/PillMark';
 
 type Props = {
   nutrient: Nutrient;
@@ -27,12 +27,10 @@ export const SHORTCUT_WIDTH = 142;
  * actually is: a way into the nutrient page. The one status it shows is real —
  * whether the nutrient is in the routine.
  *
- * To restore the mock's version, components/home/NutrientProgressCard is still
- * in the tree and the invented values are still in data/progress.ts.
+ * The mock's gamified version has been removed; the invented values it used are
+ * still in data/progress.ts if anyone wants to reconstruct it.
  */
 export function NutrientShortcut({ nutrient, inRoutine, onPress }: Props) {
-  const accent = accentFor(nutrient.id);
-
   return (
     <Pressable
       accessibilityRole="button"
@@ -40,7 +38,7 @@ export function NutrientShortcut({ nutrient, inRoutine, onPress }: Props) {
       onPress={onPress}
       style={({ pressed }) => [styles.card, pressed && styles.pressed]}
     >
-      <LetterMark letter={nutrient.letter} size={40} accent={accent} />
+      <PillMark shape={pillFor(nutrient.id)} size={56} spin />
 
       <Text style={styles.name} numberOfLines={1}>
         {nutrient.name}

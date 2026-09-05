@@ -1,16 +1,10 @@
 import { StyleSheet, Text, View } from 'react-native';
-import { NEUTRAL_ACCENT, colors, radius, spacing, typography, type Accent } from '../../theme';
+import { colors, radius, spacing, typography } from '../../theme';
 import { Icon, type IconName } from '../ui/Icon';
 
 type Props = {
   label: string;
   icon: IconName;
-  /**
-   * Kept for callers that want a tinted chip. Unused on Results, where the
-   * identity colour is carried by the card edge and heading instead — three
-   * coloured chips per card on top of that was too much.
-   */
-  accent?: Accent;
 };
 
 /**
@@ -20,7 +14,7 @@ type Props = {
  * reference; the detail page carries portions and amounts on a much larger
  * card. See components/nutrient/SourceCard.
  */
-export function FoodChip({ label, icon, accent = NEUTRAL_ACCENT }: Props) {
+export function FoodChip({ label, icon }: Props) {
   return (
     <View style={styles.chip}>
       <Icon name={icon} size={16} color={colors.onSurfaceVariant} />

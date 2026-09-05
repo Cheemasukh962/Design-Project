@@ -1,4 +1,4 @@
-# NutriLens — build handoff
+# VitaPal — build handoff
 
 React Native / Expo port of the Stitch mocks. Twelve screens, all rendering.
 
@@ -138,6 +138,34 @@ allergies" is the one answer we cannot act on — we never asked which ones and
 guessing would be dangerous — so it changes what we say rather than what we
 recommend.
 
+## Pills, not letters
+
+Every nutrient mark is a rendered pill (`components/nutrient/PillMark`). It
+turns on the nutrient page: the body is clipped to its own silhouette and the
+navy half is a rect whose width animates across it, which is what the seam of a
+two-tone cylinder actually does when you rotate it. A fixed cylindrical gradient
+supplies the volume, so the surface reads as curved while the seam travels under
+it.
+
+**Nutrients are told apart by SHAPE, not colour** — capsule, scored tablet,
+softgel. The five accent hues are gone and `theme/accents.ts` is deleted: the
+health app is white and navy again. Shape does the same job inside the brand's
+two colours and survives colour blindness, which five hues did not.
+
+## Reminders
+
+Forgetting is the failure this product has to survive, so the reminder is a
+first-class control rather than a setting: a bell on every routine row, a
+"Remind me daily" bar above the checklist, and an offer on the nutrient page the
+moment something is added — the only moment anyone is thinking about it.
+
+**NOT YET DELIVERED BY THE OS.** The state, controls and copy are real; actually
+firing a notification needs `expo-notifications` and a permission prompt, which
+is a build change rather than a design one. Nothing in the UI claims a
+notification has been scheduled. `REMINDER_TIME` in `data/RoutineContext` is the
+single time everything fires at — per-item scheduling is a time picker for a
+benefit nobody asked for, when the failure is "I forgot entirely".
+
 ## The companion (prototype for review)
 
 A starter creature that grows from your routine. Reachable at `/starter`, shown
@@ -228,10 +256,11 @@ opens in the populated state the mocks draw. **Turn that off for a real session*
 watching someone reach an empty routine and work out how to fill it is most of
 what the session is for.
 
-### 2. "Vito's tip: … absorption by 32%" — `ROUTINE_TIP` in `data/progress.ts`
+### 2. "…absorption by 32%" — `ROUTINE_TIP` in `data/progress.ts`
 
-Built as drawn, but it breaks two of the project's own guardrails at once: a
-health claim in the mascot's mouth, and an uncited statistic.
+Half-fixed. It used to be attributed to Vito, which put a health claim in a
+cartoon's mouth; Vito is gone from the product so the line now reads "Worth
+knowing". **The figure is still uncited, and that was always the worse half.**
 
 The claim itself is probably fine — vitamin D is fat-soluble and 32% closely
 matches Dawson-Hughes et al. (2015) on taking the dose with the largest
