@@ -30,7 +30,7 @@ export default function SplashRoute() {
 
       <View style={styles.content}>
         <Logo size={34} style={styles.logo} />
-        <FoldText style={styles.headline}>Improve your journey</FoldText>
+        <FoldText style={styles.headline}>Improve your life</FoldText>
 
         <Text style={styles.subhead}>Find the gaps in your diet in 60 seconds.</Text>
 
