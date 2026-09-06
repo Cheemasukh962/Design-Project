@@ -3,16 +3,20 @@ import {
   useCallback,
   useContext,
   useMemo,
-  useState,
   type ReactNode,
 } from 'react';
+import { KEYS, usePersistentState } from './storage';
 
 /**
- * Quiz answers, held in memory for the length of a session.
+ * Quiz answers, stored on the device.
  *
- * Deliberately not persisted. The PRD scopes accounts and persistence out of
- * the MVP, and a demo that remembers stale answers between usability sessions
- * is worse than one that starts clean.
+ * These used to be memory-only, on the argument that a demo which remembers
+ * stale answers between usability sessions is worse than one that starts
+ * clean. That argument was right about back-to-back sessions and wrong about
+ * everything else: a participant who reloads mid-task lost their answers, and
+ * Home silently fell back to the demo persona, so the app appeared to invent
+ * results. Between sessions the fix is Profile's "Reset demo", which is
+ * explicit and takes one tap.
  *
  * Every answer id here is referenced by name in data/inference.ts, which is
  * what lets a result cite the exact answer that produced it.
@@ -34,6 +38,8 @@ const EMPTY: QuizAnswers = { foods: [], restrictions: [] };
 
 type QuizStore = {
   answers: QuizAnswers;
+  /** False until storage has been read. */
+  hydrated: boolean;
   setSingle: (key: 'eating' | 'outside' | 'produce', value: string) => void;
   toggleMulti: (key: 'foods' | 'restrictions', value: string) => void;
   /** Replaces a multi answer outright — used by mutually exclusive options. */
@@ -44,7 +50,13 @@ type QuizStore = {
 const QuizContext = createContext<QuizStore | null>(null);
 
 export function QuizProvider({ children }: { children: ReactNode }) {
-  const [answers, setAnswers] = useState<QuizAnswers>(EMPTY);
+  const [answers, setAnswers, hydrated] = usePersistentState<QuizAnswers>(
+    KEYS.quiz,
+    EMPTY,
+    // Older entries predate these arrays; a missing one would crash the
+    // multi-select toggles on the first tap.
+    (stored) => ({ ...EMPTY, ...stored, foods: stored.foods ?? [], restrictions: stored.restrictions ?? [] }),
+  );
 
   const setSingle = useCallback(
     (key: 'eating' | 'outside' | 'produce', value: string) =>
@@ -72,8 +84,8 @@ export function QuizProvider({ children }: { children: ReactNode }) {
   const reset = useCallback(() => setAnswers(EMPTY), []);
 
   const value = useMemo(
-    () => ({ answers, setSingle, toggleMulti, setMulti, reset }),
-    [answers, setSingle, toggleMulti, setMulti, reset],
+    () => ({ answers, hydrated, setSingle, toggleMulti, setMulti, reset }),
+    [answers, hydrated, setSingle, toggleMulti, setMulti, reset],
   );
 
   return <QuizContext.Provider value={value}>{children}</QuizContext.Provider>;

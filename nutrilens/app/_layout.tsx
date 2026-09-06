@@ -14,6 +14,7 @@ import { DeviceFrame } from '../components/ui/DeviceFrame';
 import { CompanionProvider } from '../data/CompanionContext';
 import { QuizProvider } from '../data/QuizContext';
 import { RoutineProvider } from '../data/RoutineContext';
+import { SavedProvider } from '../data/SavedContext';
 import { colors } from '../theme';
 
 // Hold the native splash until Inter is ready, so no screen renders in the
@@ -42,6 +43,7 @@ export default function RootLayout() {
   return (
     <SafeAreaProvider>
       <QuizProvider>
+        <SavedProvider>
         <RoutineProvider>
         {/* Companion sits inside Routine because it awards tokens for ticked
             items, and inside Quiz because the routine itself reads answers. */}
@@ -59,6 +61,7 @@ export default function RootLayout() {
         </DeviceFrame>
         </CompanionProvider>
         </RoutineProvider>
+        </SavedProvider>
       </QuizProvider>
     </SafeAreaProvider>
   );

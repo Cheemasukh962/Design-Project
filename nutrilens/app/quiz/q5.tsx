@@ -7,7 +7,6 @@ import { QuizHeader } from '../../components/quiz/QuizHeader';
 import { Button } from '../../components/ui/Button';
 import { InsightCard } from '../../components/ui/InsightCard';
 import { Screen } from '../../components/ui/Screen';
-import { useCompanion } from '../../data/CompanionContext';
 import { useQuiz } from '../../data/QuizContext';
 import { Q5, TOTAL_STEPS } from '../../data/quiz';
 import { colors, spacing, typography } from '../../theme';
@@ -31,14 +30,11 @@ import { colors, spacing, typography } from '../../theme';
  */
 export default function Q5Route() {
   const { answers, toggleMulti, setMulti } = useQuiz();
-  const { speciesId } = useCompanion();
   const selected = answers.restrictions;
 
   // Picking a pal sits between the last question and the results, so the
   // companion is already there when the findings land — arriving at a results
   // page and *then* being asked to choose a mascot reads as an interruption.
-  // Anyone who already has one skips straight through.
-  const hasPal = speciesId !== null;
 
   const isNone = selected.includes(Q5.exclusiveId);
   const count = selected.length;
@@ -53,10 +49,6 @@ export default function Q5Route() {
   };
 
   const pickNone = () => setMulti('restrictions', isNone ? [] : [Q5.exclusiveId]);
-
-  // "Nothing in particular" is an answer, so it counts toward the CTA label —
-  // but showing "(1 selected)" for it would be nonsense.
-  const realCount = isNone ? 0 : count;
 
   return (
     <Screen>
@@ -94,21 +86,16 @@ export default function Q5Route() {
 
       <View style={styles.footer}>
         <Button
-          label={
-            hasPal
-              ? realCount > 0
-                ? `See my results (${realCount} selected)`
-                : 'See my results'
-              : 'Meet your pal'
-          }
+          label="Meet your pal"
           trailingIcon="arrow-forward"
           shape="rounded"
           disabled={count === 0}
-          onPress={() =>
-            hasPal
-              ? router.push('/results')
-              : router.push({ pathname: '/starter', params: { next: 'results' } })
-          }
+          /* Always, even for someone who already has one. Finishing the quiz is
+             the moment the pal is introduced, and skipping the screen for a
+             returning user meant the flow could not be walked end to end
+             without wiping stored state first. Re-picking the pal you already
+             have costs nothing; see choose() in data/CompanionContext.tsx. */
+          onPress={() => router.push({ pathname: '/starter', params: { next: 'results' } })}
         />
       </View>
     </Screen>

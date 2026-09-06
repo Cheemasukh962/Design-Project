@@ -1,10 +1,13 @@
 import { router } from 'expo-router';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Logo } from '../../components/brand/Logo';
 import { PillMark } from '../../components/nutrient/PillMark';
+import { Accordion } from '../../components/ui/Accordion';
 import { Icon } from '../../components/ui/Icon';
 import { Screen } from '../../components/ui/Screen';
 import { NUTRIENTS, pillFor } from '../../data/nutrients';
-import { ARTICLES } from '../../data/progress';
+import { ARTICLES } from '../../data/articles';
+import { useSaved } from '../../data/SavedContext';
 import { colors, radius, spacing, typography } from '../../theme';
 
 /**
@@ -23,6 +26,11 @@ import { colors, radius, spacing, typography } from '../../theme';
  * proposal.
  */
 export default function DiscoverRoute() {
+  const { saved } = useSaved();
+  // Widened from the literal tuple length, so the singular branch below stays
+  // reachable once there is more (or less) than the two placeholder pieces.
+  const readingCount: number = ARTICLES.length;
+
   return (
     <Screen>
       <ScrollView contentContainerStyle={styles.body} showsVerticalScrollIndicator={false}>
@@ -30,23 +38,77 @@ export default function DiscoverRoute() {
           Discover
         </Text>
 
-        <View style={styles.notice}>
-          <Icon name="info-outline" size={18} color={colors.onSecondaryContainer} />
-          <Text style={styles.noticeText}>
-            This tab has no design yet. It lists what the other screens already
-            link to so the nav bar has no dead ends.
+        {/* Was a grey box apologising for the tab. A tab that opens by
+            apologising teaches the reader to skip it, and the contents below
+            are real: two written pieces and every nutrient page. */}
+        <View style={styles.brand}>
+          <Logo size={30} />
+          <Text style={styles.brandLine}>
+            Everything worth reading, and every nutrient we cover.
           </Text>
         </View>
 
-        <Text style={styles.section}>Reading</Text>
-        <View style={styles.stack}>
-          {ARTICLES.map((article) => (
-            <View key={article.id} style={[styles.article, { backgroundColor: article.tint }]}>
-              <Text style={styles.articleTitle}>{article.title}</Text>
-              <Text style={styles.articleMeta}>{article.meta} · not written yet</Text>
+        {/* Collapsed by default. Nothing in here is written yet, so a stack of
+            unfinished cards was the first thing the tab showed and the nutrient
+            index — the only part that goes anywhere — was pushed below it. */}
+        <View style={styles.reading}>
+          <Accordion
+            title="Reading"
+            meta={`${readingCount} ${readingCount === 1 ? 'piece' : 'pieces'}`}
+          >
+            <View style={styles.stack}>
+              {ARTICLES.map((article) => (
+                <Pressable
+                  key={article.id}
+                  accessibilityRole="button"
+                  accessibilityLabel={`${article.title}. ${article.meta}.`}
+                  onPress={() =>
+                    router.push({ pathname: '/article/[id]', params: { id: article.id } })
+                  }
+                  style={({ pressed }) => [
+                    styles.article,
+                    { backgroundColor: article.tint },
+                    pressed && styles.pressed,
+                  ]}
+                >
+                  <Text style={styles.articleTitle}>{article.title}</Text>
+                  <Text style={styles.articleMeta}>{article.meta}</Text>
+                </Pressable>
+              ))}
             </View>
-          ))}
+          </Accordion>
         </View>
+
+        {saved.length > 0 && (
+          <>
+            <Text style={styles.section}>Saved</Text>
+            <View style={styles.stack}>
+              {saved
+                .map((sid) => NUTRIENTS[sid])
+                .filter(Boolean)
+                .map((nutrient) => (
+                  <Pressable
+                    key={nutrient.id}
+                    accessibilityRole="button"
+                    accessibilityLabel={`${nutrient.name}. Saved.`}
+                    onPress={() =>
+                      router.push({ pathname: '/nutrient/[id]', params: { id: nutrient.id } })
+                    }
+                    style={({ pressed }) => [styles.row, pressed && styles.pressed]}
+                  >
+                    <PillMark shape={pillFor(nutrient.id)} size={44} />
+                    <View style={styles.rowText}>
+                      <Text style={styles.rowTitle}>{nutrient.name}</Text>
+                      <Text style={styles.rowBody} numberOfLines={2}>
+                        {nutrient.summary}
+                      </Text>
+                    </View>
+                    <Icon name="favorite-border" size={20} color={colors.aggieBlue} />
+                  </Pressable>
+                ))}
+            </View>
+          </>
+        )}
 
         <Text style={styles.section}>Nutrients</Text>
         <View style={styles.stack}>
@@ -86,18 +148,18 @@ const styles = StyleSheet.create({
     color: colors.primary,
     marginBottom: spacing.stackMd,
   },
-  notice: {
-    flexDirection: 'row',
+  brand: {
     alignItems: 'flex-start',
     gap: spacing.stackSm,
     padding: spacing.cardPaddingSm,
     borderRadius: radius.md,
-    backgroundColor: colors.tintGold,
+    backgroundColor: colors.surfaceContainerLow,
+    borderWidth: 1,
+    borderColor: colors.cardEdge,
   },
-  noticeText: {
+  brandLine: {
     ...typography.caption,
-    color: colors.ink,
-    flex: 1,
+    color: colors.onSurfaceVariant,
   },
   section: {
     ...typography.h3,
@@ -105,11 +167,16 @@ const styles = StyleSheet.create({
     marginTop: spacing.stackLg,
     marginBottom: spacing.stackSm,
   },
+  reading: { marginTop: spacing.stackLg },
   stack: { gap: spacing.stackSm },
   article: {
     padding: 14,
     borderRadius: radius.md,
     gap: spacing.base,
+    // Nested inside the Reading panel, one of the article tints is within a
+    // shade of the panel's own ground and the card loses its edge entirely.
+    borderWidth: 1,
+    borderColor: colors.cardEdge,
   },
   articleTitle: {
     ...typography.bodyMd,
@@ -127,6 +194,8 @@ const styles = StyleSheet.create({
     padding: spacing.cardPaddingSm,
     borderRadius: radius.md,
     backgroundColor: colors.surfaceContainerLowest,
+    borderWidth: 1,
+    borderColor: colors.cardEdge,
   },
   pressed: { backgroundColor: '#FCFDFF' },
   rowText: { flex: 1, gap: 2 },

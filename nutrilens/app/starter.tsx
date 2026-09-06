@@ -27,10 +27,12 @@ import { radius, spacing, typography } from '../theme';
  * the user moves on. Committing to one means leaving the others behind, and a
  * pager makes that feel like a choice rather than a form field.
  *
- * They are mechanically identical and the screen says so. The split is by
- * personality — the cool one, the serious one, the funny one — which is how the
- * format's own designers describe the job, and it means there is no wrong pick
- * to regret.
+ * The copy is down to one line. Each pal used to carry a personality label, a
+ * pitch, affinity tags and an evolution preview, which turned a choice between
+ * three pictures into a spec sheet to be compared. They are mechanically
+ * identical, so there is nothing to compare and nothing to regret — the picture
+ * and the name are the whole decision, and the one line above says the only
+ * thing a person needs to know before making it.
  *
  * Arrows as well as swipe: this gets reviewed in a desktop browser, where a
  * horizontal drag is not a gesture anyone will try.
@@ -79,10 +81,7 @@ export default function StarterRoute() {
         <Text style={styles.title} accessibilityRole="header">
           Pick your pal
         </Text>
-        <Text style={styles.sub}>
-          It grows as you keep up your routine. None of them is better — pick
-          whichever you like looking at.
-        </Text>
+        <Text style={styles.sub}>It grows as you keep up your routine.</Text>
       </View>
 
       <View style={styles.pagerWrap} onLayout={onLayout}>
@@ -100,30 +99,18 @@ export default function StarterRoute() {
           >
             {SPECIES_LIST.map((s, i) => (
               <View key={s.id} style={[styles.page, { width, height }]}>
+                {/* With the copy gone the creature is the page, so it is sized
+                    to the frame rather than to a leftover gap. */}
                 <Creature
                   species={s.id}
                   stage={0}
-                  size={200}
+                  size={Math.min(300, width - spacing.screenMargin * 2)}
                   glow
                   animate={i === index}
                 />
 
                 <Text style={[styles.name, { color: s.palette.accent }]}>
                   {s.names[0]}
-                </Text>
-                <Text style={styles.personality}>{s.personality}</Text>
-                <Text style={styles.pitch}>{s.pitch}</Text>
-
-                <View style={styles.affinity}>
-                  {s.affinity.map((a) => (
-                    <View key={a} style={[styles.tag, { borderColor: s.palette.base }]}>
-                      <Text style={[styles.tagText, { color: s.palette.accent }]}>{a}</Text>
-                    </View>
-                  ))}
-                </View>
-
-                <Text style={styles.evolves}>
-                  Grows into {s.names[1]}, then {s.names[2]}
                 </Text>
               </View>
             ))}
@@ -182,8 +169,6 @@ export default function StarterRoute() {
           <Text style={styles.ctaLabel}>Choose {species.names[0]}</Text>
           <Icon name="arrow-forward" size={20} color="#ffffff" />
         </Pressable>
-
-        <Text style={styles.footnote}>You can start over later from Profile.</Text>
       </View>
     </Screen>
   );
@@ -205,45 +190,12 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     // Clear of the arrows, which are 40px discs inset 6px from each edge.
     paddingHorizontal: spacing.screenMargin + 32,
-    gap: 2,
+    gap: spacing.stackSm,
   },
-  name: { ...typography.display, fontSize: 32, lineHeight: 38, marginTop: spacing.stackSm },
-  personality: {
-    ...typography.micro,
-    letterSpacing: 0.6,
-    textTransform: 'uppercase',
-    color: companion.onNightMuted,
-  },
-  pitch: {
-    ...typography.bodyMd,
-    color: companion.onNight,
-    textAlign: 'center',
-    marginTop: spacing.stackSm,
-  },
-  affinity: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'center',
-    gap: spacing.base,
-    marginTop: spacing.base * 3,
-  },
-  tag: {
-    paddingHorizontal: spacing.stackSm,
-    paddingVertical: 2,
-    borderRadius: radius.sm,
-    borderWidth: 1,
-  },
-  tagText: { ...typography.micro, letterSpacing: 0 },
-  evolves: {
-    ...typography.caption,
-    color: companion.onNightMuted,
-    marginTop: spacing.base * 3,
-  },
+  name: { ...typography.display, fontSize: 34, lineHeight: 40, marginTop: spacing.stackMd },
   arrow: {
     position: 'absolute',
-    // Level with the creature rather than the copy — at 45% they sat on top of
-    // the pitch line and clipped it.
-    top: '32%',
+    top: '42%',
     width: 40,
     height: 40,
     borderRadius: radius.full,
@@ -283,9 +235,4 @@ const styles = StyleSheet.create({
   },
   ctaPressed: { opacity: 0.85 },
   ctaLabel: { ...typography.h3, color: '#ffffff' },
-  footnote: {
-    ...typography.caption,
-    color: companion.onNightMuted,
-    textAlign: 'center',
-  },
 });

@@ -35,20 +35,22 @@ export default function SplashRoute() {
         <Text style={styles.subhead}>Find the gaps in your diet in 60 seconds.</Text>
 
         <View style={styles.actions}>
+          {/* One door. "Continue as guest" landed people on a Home built from
+              a stranger's answers, and there is no account for it to be an
+              alternative to. */}
           <Button
             label="Take the quiz"
             variant="primary"
             onPress={() => router.push('/quiz/q1')}
           />
-          <Button
-            label="Continue as guest"
-            variant="tertiary"
-            onPress={() => router.replace('/home')}
-          />
         </View>
 
+        {/* Both of these went nowhere until the screens behind them existed. */}
         <FooterLinks
-          links={[{ label: 'Not medical advice' }, { label: 'How this works' }]}
+          links={[
+            { label: 'Not medical advice', onPress: () => router.push('/disclaimer') },
+            { label: 'How this works', onPress: () => router.push('/how-it-works') },
+          ]}
         />
       </View>
     </Screen>
@@ -57,16 +59,19 @@ export default function SplashRoute() {
 
 const styles = StyleSheet.create({
   mascotArea: {
-    // 397px of a 884px reference frame in the mock — 45%.
-    flexBasis: '45%',
+    // Was 45% of the frame, from the mock. With one button instead of two
+    // there is room to let the pal sit at full size without the copy below it
+    // being pushed off the bottom.
+    flexBasis: '52%',
     alignItems: 'center',
     justifyContent: 'center',
+    paddingTop: spacing.stackMd,
   },
   logo: { marginBottom: spacing.stackMd },
   content: {
     flex: 1,
     alignItems: 'center',
-    paddingTop: spacing.stackLg,
+    paddingTop: spacing.stackSm,
     paddingBottom: spacing.stackLg,
   },
   headline: {

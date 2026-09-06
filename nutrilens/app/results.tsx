@@ -1,5 +1,5 @@
 import { router } from 'expo-router';
-import { useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { Creature } from '../components/companion/Creature';
 import { ResultCard } from '../components/results/ResultCard';
@@ -7,12 +7,10 @@ import { BrandBar } from '../components/ui/BrandBar';
 import { Icon } from '../components/ui/Icon';
 import { Button } from '../components/ui/Button';
 import { Screen } from '../components/ui/Screen';
-import { Toast } from '../components/ui/Toast';
 import { useCompanion } from '../data/CompanionContext';
 import { useQuiz } from '../data/QuizContext';
 import { DEMO_ANSWERS, hasAnswers, inferFindings } from '../data/inference';
 import { ALLERGY_CAVEAT, applyRestrictions, hasAllergyFlag } from '../data/restrictions';
-import { useRoutine } from '../data/RoutineContext';
 import { colors, radius, spacing, typography } from '../theme';
 
 /**
@@ -38,9 +36,7 @@ import { colors, radius, spacing, typography } from '../theme';
  */
 export default function ResultsRoute() {
   const { answers } = useQuiz();
-  const { added, add, remove } = useRoutine();
   const { speciesId, stage } = useCompanion();
-  const [toast, setToast] = useState<{ ids: string[]; label: string } | null>(null);
 
   // Someone can arrive here without taking the quiz — from Home, or a deep
   // link. Rather than an empty screen, fall back to the demo persona and say so.
@@ -56,21 +52,6 @@ export default function ResultsRoute() {
     effective.produce,
     effective.restrictions.length ? 'restrictions' : undefined,
   ].filter(Boolean).length;
-
-  const allAdded = findings.every((f) => added.includes(f.nutrient.id));
-
-  const handleAddAll = () => {
-    if (allAdded) {
-      router.push('/routine');
-      return;
-    }
-    const fresh = findings.map((f) => f.nutrient.id).filter((id) => !added.includes(id));
-    fresh.forEach(add);
-    setToast({
-      ids: fresh,
-      label: `${fresh.length} added to your routine`,
-    });
-  };
 
   return (
     <Screen>
@@ -123,16 +104,12 @@ export default function ResultsRoute() {
           </View>
         )}
 
+        {/* One way on, and it is not "add everything".
+            Adding lives on each nutrient's own page, where there is enough
+            context to decide — and bulk-adding five nutrients produced a
+            routine nobody had chosen, which is the opposite of the point. */}
         <View style={styles.actions}>
-          <Button
-            label={allAdded ? 'Go to my routine' : 'Add these to my routine'}
-            onPress={handleAddAll}
-          />
-          <Button
-            label="Go to home"
-            variant="outline"
-            onPress={() => router.replace('/home')}
-          />
+          <Button label="Continue" onPress={() => router.replace('/home')} />
         </View>
 
         <Text style={styles.disclaimer}>
@@ -142,17 +119,6 @@ export default function ResultsRoute() {
         </Text>
       </ScrollView>
 
-      {toast && (
-        <Toast
-          message={toast.label}
-          actionLabel="Undo"
-          onAction={() => {
-            toast.ids.forEach(remove);
-            setToast(null);
-          }}
-          onHide={() => setToast(null)}
-        />
-      )}
     </Screen>
   );
 }

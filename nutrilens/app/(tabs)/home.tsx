@@ -195,7 +195,9 @@ export default function HomeRoute() {
               title={article.title}
               meta={article.meta}
               tint={article.tint}
-              onPress={() => router.push('/discover')}
+              onPress={() =>
+                router.push({ pathname: '/article/[id]', params: { id: article.id } })
+              }
             />
           ))}
         </View>
@@ -263,6 +265,8 @@ const styles = StyleSheet.create({
     padding: 18,
     borderRadius: radius.md,
     backgroundColor: colors.surfaceContainerLowest,
+    borderWidth: 1,
+    borderColor: colors.cardEdge,
     shadowColor: '#022851',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.05,

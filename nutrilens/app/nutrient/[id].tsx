@@ -13,6 +13,7 @@ import { NUTRIENTS, pillFor } from '../../data/nutrients';
 import { useQuiz } from '../../data/QuizContext';
 import { applyRestrictions } from '../../data/restrictions';
 import { useRoutine } from '../../data/RoutineContext';
+import { useSaved } from '../../data/SavedContext';
 import { colors, radius, spacing, typography } from '../../theme';
 
 /**
@@ -30,8 +31,10 @@ import { colors, radius, spacing, typography } from '../../theme';
  */
 export default function NutrientDetailRoute() {
   const { id } = useLocalSearchParams<{ id: string }>();
-  const { added, add, items, reminders, reminderTime, toggleReminder } = useRoutine();
+  const { added, add, items, reminders, reminderTime, reminderStatus, toggleReminder } =
+    useRoutine();
   const { answers } = useQuiz();
+  const { saved, toggleSaved } = useSaved();
 
   const nutrient = NUTRIENTS[id ?? ''];
 
@@ -45,6 +48,7 @@ export default function NutrientDetailRoute() {
   }
 
   const inRoutine = added.includes(nutrient.id);
+  const isSaved = saved.includes(nutrient.id);
   // Every routine item this nutrient expanded into.
   const mine = items.filter((i) => i.nutrientId === nutrient.id);
   const remindOn = mine.length > 0 && mine.every((i) => reminders.includes(i.id));
@@ -54,11 +58,17 @@ export default function NutrientDetailRoute() {
   return (
     <Screen padded={false}>
       <View style={styles.bar}>
+        {/* The heart was decorative — it had no handler at all. It keeps a
+            list now, and Discover shows it. */}
         <AppBar
           title={nutrient.name}
           onBack={() => router.back()}
           actionIcon="favorite-border"
-          actionLabel={`Save ${nutrient.name}`}
+          actionActive={isSaved}
+          actionLabel={
+            isSaved ? `Remove ${nutrient.name} from saved` : `Save ${nutrient.name}`
+          }
+          onAction={() => toggleSaved(nutrient.id)}
         />
       </View>
 
@@ -131,6 +141,9 @@ export default function NutrientDetailRoute() {
           <Pressable
             accessibilityRole="button"
             accessibilityLabel="Where to buy supplements"
+            onPress={() =>
+              router.push({ pathname: '/supplements', params: { id: nutrient.id } })
+            }
             style={({ pressed }) => [styles.linkRow, pressed && styles.linkPressed]}
           >
             <Text style={styles.linkLabel}>Where to buy supplements</Text>
@@ -195,13 +208,23 @@ export default function NutrientDetailRoute() {
               color={remindOn ? colors.onPrimary : colors.aggieBlue}
             />
             <Text style={[styles.remindLabel, remindOn && { color: colors.onPrimary }]}>
-              {remindOn ? `Reminder set for ${reminderTime}` : 'Remind me daily'}
+              {/* Never claims a notification was scheduled when none was. */}
+              {!remindOn
+                ? 'Remind me daily'
+                : reminderStatus === 'scheduled'
+                  ? `Reminder set for ${reminderTime}`
+                  : reminderStatus === 'denied'
+                    ? 'Notifications blocked'
+                    : `Saved for ${reminderTime}`}
             </Text>
           </Pressable>
         )}
 
+        {/* Names what it adds. "Add to my routine" used to drop the pill, a
+            meal and a habit in at once, so the button and the result did not
+            match. It adds one line now. */}
         <Button
-          label={inRoutine ? 'In your routine' : 'Add to my routine'}
+          label={inRoutine ? 'In your routine' : `Add ${nutrient.name} supplement`}
           variant={inRoutine ? 'outline' : 'primary'}
           onPress={() => (inRoutine ? router.push('/routine') : add(nutrient.id))}
         />
@@ -230,7 +253,7 @@ const styles = StyleSheet.create({
     borderRadius: radius.md,
     backgroundColor: 'rgba(238,244,255,0.7)',
     borderWidth: 1,
-    borderColor: 'rgba(196,198,208,0.2)',
+    borderColor: colors.cardEdge,
     gap: spacing.base * 3,
     shadowColor: '#022851',
     shadowOffset: { width: 0, height: 4 },

@@ -27,6 +27,47 @@ const restrictionLabel = (id: string) =>
   Q5.options.find((o) => o.id === id)?.label ?? id;
 
 /**
+ * The rules in one sentence each, for the "How this works" screen.
+ *
+ * KEEP THIS IN SYNC WITH inferFindings BELOW. It lives in this file, directly
+ * above the implementation, precisely so that a change to a condition and a
+ * change to its description are the same diff. Printing the rules is the whole
+ * transparency argument — a description that has drifted from the code is
+ * worse than printing nothing, because it is a claim about behaviour that is
+ * no longer true.
+ */
+export const RULES: { id: string; nutrientId: string; when: string }[] = [
+  {
+    id: 'd',
+    nutrientId: 'Vitamin D',
+    when: 'You are outside less than 30 minutes on a normal day.',
+  },
+  {
+    id: 'b12',
+    nutrientId: 'Vitamin B12',
+    when: 'You eat at most one of dairy, eggs, fish or meat — or you told us no meat.',
+  },
+  {
+    id: 'c',
+    nutrientId: 'Vitamin C',
+    when: 'Fruit or vegetables show up rarely, or about once a day.',
+  },
+  {
+    id: 'iron',
+    nutrientId: 'Iron',
+    when: 'You eat neither meat nor fish, or you told us you avoid one of them.',
+  },
+  {
+    id: 'calcium',
+    nutrientId: 'Calcium',
+    when: 'You did not pick dairy, or you told us no dairy.',
+  },
+];
+
+/** At most three findings are ever shown, highest weight first. */
+export const MAX_FINDINGS = 3;
+
+/**
  * Turns quiz answers into at most three findings.
  *
  * These are deliberately simple, readable rules rather than a model — the
