@@ -1,6 +1,7 @@
 import { useState, type ReactNode } from 'react';
 import { LayoutAnimation, Platform, Pressable, StyleSheet, Text, UIManager, View } from 'react-native';
 import { colors, radius, spacing, typography } from '../../theme';
+import { Badge } from './Badge';
 import { Icon, type IconName } from './Icon';
 
 if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
@@ -14,6 +15,14 @@ type Props = {
   defaultOpen?: boolean;
   /** Leading glyph in the header, e.g. `biotech` on "What it does". */
   icon?: IconName;
+  /**
+   * Short badge in the header, e.g. "2 pieces".
+   *
+   * A closed section that gives no hint of what is inside asks the reader to
+   * open it just to find out whether it was worth opening. The count answers
+   * that from the outside, the same way Home's routine header does.
+   */
+  meta?: string;
   /**
    * `card` — a filled panel with a border, used for "What it does".
    * `plain` — no fill or border, used for the footer's "Sources" row.
@@ -33,6 +42,7 @@ export function Accordion({
   children,
   defaultOpen = false,
   icon,
+  meta,
   variant = 'card',
 }: Props) {
   const [open, setOpen] = useState(defaultOpen);
@@ -56,6 +66,7 @@ export function Accordion({
           </View>
         )}
         <Text style={[styles.title, plain && styles.titlePlain]}>{title}</Text>
+        {meta && <Badge tone="neutral" label={meta} style={styles.meta} />}
         <View style={open ? styles.chevronOpen : undefined}>
           <Icon name="expand-more" size={22} color={colors.onSurfaceVariant} />
         </View>
@@ -73,7 +84,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.surfaceContainerLow,
     borderRadius: radius.md,
     borderWidth: 1,
-    borderColor: 'rgba(196,198,208,0.2)',
+    borderColor: colors.cardEdge,
     overflow: 'hidden',
   },
   wrapPlain: {
@@ -95,6 +106,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 0,
     paddingVertical: spacing.base * 3,
     minHeight: 48,
+  },
+  meta: {
+    marginRight: spacing.stackSm,
   },
   chevronOpen: {
     transform: [{ rotate: '180deg' }],

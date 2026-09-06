@@ -92,7 +92,7 @@ const styles = StyleSheet.create({
     borderRadius: radius.md,
     padding: spacing.cardPaddingSm,
     borderWidth: 1,
-    borderColor: colors.surfaceContainer,
+    borderColor: colors.cardEdge,
     gap: spacing.stackSm,
     shadowColor: '#435f8b',
     shadowOffset: { width: 0, height: 4 },

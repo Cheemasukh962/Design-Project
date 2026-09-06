@@ -26,6 +26,7 @@ export type IconName =
   | 'explore'
   | 'calendar-today'
   | 'person'
+  | 'favorite'
   | 'favorite-border'
   | 'open-in-new'
   | 'storefront'

@@ -67,6 +67,8 @@ const styles = StyleSheet.create({
     gap: spacing.base,
     borderRadius: radius.md,
     backgroundColor: colors.surfaceContainerLowest,
+    borderWidth: 1,
+    borderColor: colors.cardEdge,
     shadowColor: '#435f8b',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.06,

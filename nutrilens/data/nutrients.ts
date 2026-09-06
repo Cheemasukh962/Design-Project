@@ -1,9 +1,16 @@
 import type { IconName } from '../components/ui/Icon';
+import type { FoodKind } from '../components/nutrient/FoodMark';
 import type { PillShape } from '../components/nutrient/PillMark';
 
 export type FoodSource = {
   label: string;
   icon: IconName;
+  /**
+   * Which illustration to draw. Kept separate from `label` because a
+   * restriction can rename the label — "Red meat" becomes "Halal or kosher
+   * meat" — and the picture must survive the rename unchanged.
+   */
+  art: FoodKind;
   /** Headline figure on the detail card — "100% DV", "Optimal". */
   amount?: string;
   /** Portion this figure refers to — "1 palm-sized fillet". */
@@ -105,10 +112,10 @@ export const NUTRIENTS: Record<string, Nutrient> = {
       },
     ],
     foods: [
-      { label: 'Wild salmon', icon: 'set-meal', amount: '100% DV', portion: '1 palm-sized fillet' },
-      { label: 'Whole eggs', icon: 'egg', amount: '15% DV', portion: '2 large eggs (yolks)' },
-      { label: 'Fortified milk', icon: 'water-drop', amount: '20% DV', portion: '1 cup dairy or plant milk' },
-      { label: 'Midday sun', icon: 'wb-sunny', amount: 'Optimal', portion: '15–20 mins exposure' },
+      { label: 'Wild salmon', art: 'salmon', icon: 'set-meal', amount: '100% DV', portion: '1 palm-sized fillet' },
+      { label: 'Whole eggs', art: 'egg', icon: 'egg', amount: '15% DV', portion: '2 large eggs (yolks)' },
+      { label: 'Fortified milk', art: 'milk', icon: 'water-drop', amount: '20% DV', portion: '1 cup dairy or plant milk' },
+      { label: 'Midday sun', art: 'sun', icon: 'wb-sunny', amount: 'Optimal', portion: '15–20 mins exposure' },
     ],
     perspective: {
       quote:
@@ -140,9 +147,9 @@ export const NUTRIENTS: Record<string, Nutrient> = {
       },
     ],
     foods: [
-      { label: 'Eggs', icon: 'egg', portion: '2 large eggs' },
-      { label: 'Dairy', icon: 'water-drop', portion: '1 cup milk or yoghurt' },
-      { label: 'Fortified foods', icon: 'bakery-dining', portion: 'Cereal, nutritional yeast' },
+      { label: 'Eggs', art: 'egg', icon: 'egg', portion: '2 large eggs' },
+      { label: 'Dairy', art: 'milk', icon: 'water-drop', portion: '1 cup milk or yoghurt' },
+      { label: 'Fortified foods', art: 'grain', icon: 'bakery-dining', portion: 'Cereal, nutritional yeast' },
     ],
   },
   c: {
@@ -167,9 +174,9 @@ export const NUTRIENTS: Record<string, Nutrient> = {
       },
     ],
     foods: [
-      { label: 'Citrus', icon: 'fruit-citrus', portion: '1 orange' },
-      { label: 'Peppers', icon: 'chili-mild', portion: 'Half a bell pepper' },
-      { label: 'Leafy greens', icon: 'eco', portion: '1 cup raw' },
+      { label: 'Citrus', art: 'citrus', icon: 'fruit-citrus', portion: '1 orange' },
+      { label: 'Peppers', art: 'pepper', icon: 'chili-mild', portion: 'Half a bell pepper' },
+      { label: 'Leafy greens', art: 'greens', icon: 'eco', portion: '1 cup raw' },
     ],
   },
   iron: {
@@ -194,9 +201,9 @@ export const NUTRIENTS: Record<string, Nutrient> = {
       },
     ],
     foods: [
-      { label: 'Beans / lentils', icon: 'grain', portion: '1 cup cooked' },
-      { label: 'Leafy greens', icon: 'eco', portion: '1 cup cooked' },
-      { label: 'Red meat', icon: 'restaurant', portion: '1 palm-sized portion' },
+      { label: 'Beans / lentils', art: 'beans', icon: 'grain', portion: '1 cup cooked' },
+      { label: 'Leafy greens', art: 'greens', icon: 'eco', portion: '1 cup cooked' },
+      { label: 'Red meat', art: 'meat', icon: 'restaurant', portion: '1 palm-sized portion' },
     ],
   },
   calcium: {
@@ -221,9 +228,9 @@ export const NUTRIENTS: Record<string, Nutrient> = {
       },
     ],
     foods: [
-      { label: 'Dairy', icon: 'water-drop', portion: '1 cup milk or yoghurt' },
-      { label: 'Fortified foods', icon: 'bakery-dining', portion: 'Fortified plant milk' },
-      { label: 'Leafy greens', icon: 'eco', portion: '1 cup cooked' },
+      { label: 'Dairy', art: 'milk', icon: 'water-drop', portion: '1 cup milk or yoghurt' },
+      { label: 'Fortified foods', art: 'grain', icon: 'bakery-dining', portion: 'Fortified plant milk' },
+      { label: 'Leafy greens', art: 'greens', icon: 'eco', portion: '1 cup cooked' },
     ],
   },
 };

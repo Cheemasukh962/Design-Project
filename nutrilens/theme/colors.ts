@@ -118,6 +118,19 @@ export const colors = {
   /** ---- Hairlines and tints the mocks use directly ---- */
   /** Card hairline on cream/white surfaces. */
   hairline: '#E8EBEF',
+  /**
+   * The edge on a white card.
+   *
+   * White cards sit on #f8f9ff, so the only thing separating a card from the
+   * page was a soft shadow — which all but vanishes on a laptop screen at an
+   * angle, and disappears entirely in a screenshot pasted into a slide. A
+   * hairline holds the edge in every one of those conditions.
+   *
+   * Navy at 12%, not black: a neutral grey line beside #022851 reads as dirt,
+   * and a tinted line reads as the same family as everything else on the page.
+   * Low enough that it draws the boundary without becoming a drawn box.
+   */
+  cardEdge: 'rgba(2,40,81,0.12)',
   /** Blue hairline on the Home header and routine checkboxes. */
   hairlineBlue: '#B8D0E8',
   /** Unchecked checkbox stroke on the quiz tiles. */

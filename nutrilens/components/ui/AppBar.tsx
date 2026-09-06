@@ -9,13 +9,22 @@ type Props = {
   actionIcon?: IconName;
   onAction?: () => void;
   actionLabel?: string;
+  /** Filled/tinted state, e.g. a nutrient that is already saved. */
+  actionActive?: boolean;
 };
 
 /**
  * The shared top bar for non-quiz screens. The quiz uses QuizHeader instead —
  * it needs a stepper, not a title.
  */
-export function AppBar({ title, onBack, actionIcon, onAction, actionLabel }: Props) {
+export function AppBar({
+  title,
+  onBack,
+  actionIcon,
+  onAction,
+  actionLabel,
+  actionActive = false,
+}: Props) {
   return (
     <View style={styles.bar}>
       {onBack ? (
@@ -42,7 +51,11 @@ export function AppBar({ title, onBack, actionIcon, onAction, actionLabel }: Pro
           onPress={onAction}
           style={({ pressed }) => [styles.touch, pressed && styles.pressed]}
         >
-          <Icon name={actionIcon} size={22} color={colors.onSurfaceVariant} />
+          <Icon
+            name={actionActive ? 'favorite' : actionIcon}
+            size={22}
+            color={actionActive ? colors.aggieBlue : colors.onSurfaceVariant}
+          />
         </Pressable>
       ) : (
         <View style={styles.touch} />

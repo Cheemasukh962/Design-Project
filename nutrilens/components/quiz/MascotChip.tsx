@@ -37,7 +37,7 @@ const styles = StyleSheet.create({
     borderRadius: radius.full,
     backgroundColor: colors.surfaceContainerLowest,
     borderWidth: 1,
-    borderColor: colors.hairline,
+    borderColor: colors.cardEdge,
   },
   label: {
     ...typography.caption,
