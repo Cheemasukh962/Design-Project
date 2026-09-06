@@ -139,8 +139,15 @@ export const SEED_DEMO_ROUTINE = true;
  */
 export const SEED_PICKS = ['d-0', 'd-1', 'b12-0', 'c-0'];
 
-/** Routine item ids pre-ticked when the seed is on. Ids are `<nutrient>-<index>`. */
-export const SEED_DONE = ['d-0', 'b12-0'];
+/**
+ * Routine item ids pre-ticked when the seed is on.
+ *
+ * Empty on purpose. The demo opens with a full routine and nothing ticked, so
+ * the first tap in front of an audience is the one that fills the heart. Two
+ * pre-ticked items meant HP had already climbed off its starting value before
+ * anyone saw the screen.
+ */
+export const SEED_DONE: string[] = [];
 
 /**
  * The mascot tip on the routine tracker.

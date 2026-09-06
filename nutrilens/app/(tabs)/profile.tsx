@@ -1,7 +1,6 @@
 import { router } from 'expo-router';
 import { useCallback } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
-import { GrowthTrack } from '../../components/companion/GrowthTrack';
 import { Accordion } from '../../components/ui/Accordion';
 import { ProfileHero } from '../../components/profile/ProfileHero';
 import { Icon, type IconName } from '../../components/ui/Icon';
@@ -79,28 +78,6 @@ export default function ProfileRoute() {
           />
         </View>
 
-        {/* White, not navy. With the hero above it already dark, a second
-            dark block made the screen read as navy-white-navy stripes. The
-            track switches to brand navy on light so no elemental colour lands
-            on a light surface. */}
-        <Text style={styles.section}>Lifetime stats</Text>
-        <View style={styles.statCard}>
-          <View style={styles.stats}>
-            <Stat icon="bolt" label="Tokens earned" value={String(tokens)} />
-            <Stat icon="auto-awesome" label="Growth stage" value={stage + 1 + "/3"} />
-            <Stat icon="favorite-border" label="Care right now" value={Math.round(care) + "%"} />
-          </View>
-
-          {speciesId && (
-            <GrowthTrack speciesId={speciesId} stage={stage} tokens={tokens} tone="light" />
-          )}
-
-          <Text style={styles.statNote}>
-            One token for every routine item you tick off. Tokens never go down,
-            and re-ticking something does not count twice.
-          </Text>
-        </View>
-
         {/* A dropdown, not a grid of tiles.
             Four square tiles fitted on the screen and lost the sentence that
             made each one legible — "Not medical advice" wrapped to two lines
@@ -169,16 +146,6 @@ export default function ProfileRoute() {
   );
 }
 
-function Stat({ icon, label, value }: { icon: IconName; label: string; value: string }) {
-  return (
-    <View style={styles.stat}>
-      <Icon name={icon} size={18} color={colors.secondary} />
-      <Text style={styles.statValue}>{value}</Text>
-      <Text style={styles.statLabel}>{label}</Text>
-    </View>
-  );
-}
-
 function Row({
   icon,
   label,
@@ -244,42 +211,10 @@ const styles = StyleSheet.create({
     marginTop: spacing.stackLg,
     marginBottom: spacing.stackSm,
   },
-  statCard: {
-    padding: spacing.cardPaddingLg,
-    borderRadius: radius.md,
-    backgroundColor: colors.surfaceContainerLowest,
-    borderWidth: 1,
-    borderColor: colors.cardEdge,
-    gap: spacing.stackMd,
-    alignItems: 'flex-start',
-  },
-  stats: {
-    flexDirection: 'row',
-    alignSelf: 'stretch',
-  },
-  stat: {
-    flex: 1,
-    alignItems: 'center',
-    gap: 2,
-  },
-  statValue: {
-    ...typography.h2,
-    color: colors.aggieBlue,
-  },
-  statNote: {
-    ...typography.caption,
-    color: colors.onSurfaceVariant,
-  },
   reset: {
     ...typography.caption,
     color: colors.outline,
     marginTop: spacing.stackMd,
-    textAlign: 'center',
-  },
-  statLabel: {
-    ...typography.micro,
-    letterSpacing: 0,
-    color: colors.onSurfaceVariant,
     textAlign: 'center',
   },
   actions: { marginTop: spacing.stackSm },

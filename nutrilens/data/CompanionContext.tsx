@@ -55,7 +55,7 @@ type Persisted = {
 const EMPTY: Persisted = {
   speciesId: null,
   tokens: 0,
-  care: CARE.MAX,
+  care: CARE.START,
   lastDay: today(),
   rewarded: [],
   rewardedDay: today(),
@@ -197,7 +197,7 @@ export function CompanionProvider({ children }: { children: ReactNode }) {
       // have a pal. Re-confirming the one you have must not top the care meter
       // back up — that would make re-running the quiz a way to undo neglect.
       if (s.speciesId === id) return s;
-      return { ...s, speciesId: id, care: CARE.MAX, lastDay: today() };
+      return { ...s, speciesId: id, care: CARE.START, lastDay: today() };
     });
   }, []);
 

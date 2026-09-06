@@ -23,16 +23,14 @@ type Props = {
  * Ported from the Results mock: nutrient name at h2 in brand blue, a plain
  * description, then the food-source pills.
  *
- * ONE ADDITION TO THE MOCK — the "Why this is here" line. The mock shows only
- * the generic description ("Crucial for bone health and immune support"), which
- * is true of the nutrient but says nothing about this person. The research this
- * project is built on found that people reject nutrition advice on relevance
- * rather than accuracy, and an earlier spec required the reason line, so
- * dropping it looked like a regression rather than a decision.
- *
- * It is added rather than substituted: the description stays exactly where the
- * mock puts it, and the reason sits underneath in a quieter register. If it is
- * genuinely unwanted, deleting the `reason` block below is the whole change.
+ * NO "WHY THIS IS HERE" LINE. The card used to quote the answer behind each
+ * finding in a gold panel — "You picked dairy but not eggs, fish or meat". It
+ * was there because the research this project is built on found that people
+ * reject nutrition advice on relevance rather than accuracy, and the reasoning
+ * still exists: `Finding.reason` is unchanged, and the "How this works" screen
+ * prints every rule in full. It is off the card because on a first read it was
+ * the loudest thing on the page and it explained a decision nobody had
+ * questioned yet.
  *
  * Note what is still absent: no percentage, no meter, no confidence score.
  * Nothing was measured, so nothing here may look measured.
@@ -43,12 +41,12 @@ type Props = {
  * capsule, tablet or softgel. See components/nutrient/PillMark.
  */
 export function ResultCard({ finding, foods, onOpen }: Props) {
-  const { nutrient, reason } = finding;
+  const { nutrient } = finding;
 
   return (
     <Pressable
       accessibilityRole="button"
-      accessibilityLabel={`${nutrient.name}. ${nutrient.summary} ${reason}`}
+      accessibilityLabel={`${nutrient.name}. ${nutrient.summary}`}
       onPress={onOpen}
       style={({ pressed }) => [styles.card, pressed && styles.pressed]}
     >
@@ -59,11 +57,6 @@ export function ResultCard({ finding, foods, onOpen }: Props) {
       </View>
 
       <Text style={styles.summary}>{nutrient.summary}</Text>
-
-      <View style={styles.reason}>
-        <Icon name="info-outline" size={16} color={colors.onSecondaryContainer} />
-        <Text style={styles.reasonText}>{reason}</Text>
-      </View>
 
       <View style={styles.chips}>
         {foods.length > 0 ? (
@@ -114,19 +107,6 @@ const styles = StyleSheet.create({
   summary: {
     ...typography.bodyMd,
     color: colors.onSurfaceVariant,
-  },
-  reason: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    gap: spacing.stackSm,
-    padding: spacing.stackSm + spacing.base,
-    borderRadius: radius.base,
-    backgroundColor: colors.tintGold,
-  },
-  reasonText: {
-    ...typography.caption,
-    color: colors.ink,
-    flex: 1,
   },
   chips: {
     flexDirection: 'row',

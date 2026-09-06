@@ -37,7 +37,8 @@
     "ios": "expo start --ios",
     "web": "expo start --web",
     "test": "node --import ./tools/ts-register.mjs --test \"data/**/*.test.ts\"",
-    "e2e": "node tools/e2e.mjs"
+    "e2e": "node tools/e2e.mjs",
+    "build:web": "expo export --platform web"
   },
   "private": true
 }

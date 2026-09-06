@@ -59,8 +59,10 @@ await check('landed on results', "Here's what we found");
 const meat = await has('Red meat');
 console.log(`  ${meat ? 'FAIL' : 'OK  '} no-meat removed the red meat suggestion`);
 const cites = await has('You said');
-console.log(`  ${cites ? 'OK  ' : 'FAIL'} findings cite the answer behind them`);
-await tap('Add these to my routine');
+console.log(`  ${cites ? 'FAIL' : 'OK  '} results card carries no reason panel`);
+const allergy = await has('We do not know which');
+console.log(`  ${allergy ? 'FAIL' : 'OK  '} no allergy caveat block`);
+await tap('Continue');
 
 console.log('\n== PERSISTENCE (reload) ==');
 await go('home');
@@ -75,7 +77,7 @@ for (const [route, needle] of [
   ['supplements', 'What to check on the label'],
   ['article/b12-campus', 'Where it comes from'],
   ['article/budget-produce', 'Frozen is not the compromise'],
-  ['companion', 'How it grows'],
+  ['companion', 'HP'],
 ]) {
   await go(route);
   console.log(`  ${(await has(needle)) ? 'OK  ' : 'FAIL'} /${route}`);
@@ -120,8 +122,7 @@ console.log(`  ${carried === 0 ? 'OK  ' : 'FAIL'} yesterday's ticks cleared over
 await tap('Remind me daily');
 await check('reminder bar tells the truth on web', 'not in a browser');
 await go('profile');
-await check('lifetime stats present', 'Tokens earned');
-await check('notice no longer claims nothing is saved', 'stored on this');
+await check('profile leads with HP', 'HP');
 
 console.log('');
 console.log('== ROUTINE IS USABLE ==');

@@ -1,5 +1,5 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
-import { SPECIES, moodLine, tokensToNextStage } from '../../data/companion';
+import { SPECIES, moodLine } from '../../data/companion';
 import { useCompanion } from '../../data/CompanionContext';
 import { companion } from '../../theme/companion';
 import { radius, spacing, typography } from '../../theme';
@@ -26,7 +26,7 @@ type Props = {
  * waiting is a better first thing to see than a number.
  */
 export function CompanionCard({ onOpen, onPick }: Props) {
-  const { hydrated, speciesId, tokens, care, stage, mood } = useCompanion();
+  const { hydrated, speciesId, care, stage, mood } = useCompanion();
 
   // Nothing until storage has been read, so the card never flashes the
   // "pick a pal" prompt at someone who already has one.
@@ -53,12 +53,11 @@ export function CompanionCard({ onOpen, onPick }: Props) {
   }
 
   const species = SPECIES[speciesId];
-  const toNext = tokensToNextStage(tokens);
 
   return (
     <Pressable
       accessibilityRole="button"
-      accessibilityLabel={`${species.names[stage]}. ${moodLine(speciesId, mood)} ${tokens} tokens.`}
+      accessibilityLabel={`${species.names[stage]}. ${moodLine(speciesId, mood)} HP ${Math.round(care)} percent.`}
       onPress={onOpen}
       style={({ pressed }) => [styles.card, pressed && styles.pressed]}
     >
@@ -72,13 +71,6 @@ export function CompanionCard({ onOpen, onPick }: Props) {
           {moodLine(speciesId, mood)}
         </Text>
 
-        <View style={styles.meta}>
-          <View style={styles.metaItem}>
-            <Icon name="bolt" size={13} color={species.palette.accent} />
-            <Text style={styles.metaText}>{tokens}</Text>
-          </View>
-          {toNext > 0 && <Text style={styles.metaText}>{toNext} to evolve</Text>}
-        </View>
       </View>
 
       {/* The HP heart takes the chevron's place: the card is tappable anyway,

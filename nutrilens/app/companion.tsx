@@ -1,17 +1,10 @@
 import { router } from 'expo-router';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { CareMeter } from '../components/companion/CareMeter';
-import { GrowthTrack } from '../components/companion/GrowthTrack';
 import { Creature } from '../components/companion/Creature';
 import { Icon } from '../components/ui/Icon';
 import { Screen } from '../components/ui/Screen';
-import {
-  CARE,
-  SPECIES,
-  STAGE_THRESHOLDS,
-  moodLine,
-  tokensToNextStage,
-} from '../data/companion';
+import { CARE, SPECIES, STAGE_THRESHOLDS, moodLine } from '../data/companion';
 import { useCompanion } from '../data/CompanionContext';
 import { companion } from '../theme/companion';
 import { radius, spacing, typography } from '../theme';
@@ -71,8 +64,6 @@ export default function CompanionRoute() {
 
   const species = SPECIES[speciesId];
   const name = species.names[stage];
-  const toNext = tokensToNextStage(tokens);
-  const maxed = stage === 2;
 
   return (
     <Screen background="night">
@@ -95,9 +86,7 @@ export default function CompanionRoute() {
         </View>
 
         <Text style={[styles.name, { color: species.palette.accent }]}>{name}</Text>
-        <Text style={styles.stageLabel}>
-          {maxed ? 'Fully grown' : `Stage ${stage + 1} of 3`} · {species.personality}
-        </Text>
+        <Text style={styles.stageLabel}>{species.personality}</Text>
         <Text style={styles.mood}>{moodLine(speciesId, mood)}</Text>
 
         {/* ---- HP ----
@@ -119,32 +108,6 @@ export default function CompanionRoute() {
               Tick anything today: +{CARE.RECOVER}. Skip a day: −{CARE.DECAY}.
             </Text>
             <Text style={styles.hpFloor}>Never below {CARE.FLOOR}%. {name} cannot die.</Text>
-          </View>
-        </View>
-
-        <View style={styles.tokenPanel}>
-          <Icon name="bolt" size={18} color={species.palette.accent} />
-          <Text style={styles.tokenValue}>{tokens}</Text>
-          <Text style={styles.tokenLabel}>tokens earned</Text>
-        </View>
-
-        {/* ---- Growth ---- */}
-        <View style={styles.panel}>
-          <GrowthTrack speciesId={speciesId} stage={stage} tokens={tokens} title="Growth" />
-        </View>
-
-        {/* ---- Where tokens come from ---- */}
-        <View style={styles.panel}>
-          <Text style={styles.panelTitle}>How it grows</Text>
-          <Text style={styles.panelBody}>
-            One token per item you tick off. Nothing else earns them.
-          </Text>
-          <View style={styles.affinity}>
-            {species.affinity.map((a) => (
-              <View key={a} style={[styles.tag, { borderColor: species.palette.base }]}>
-                <Text style={[styles.tagText, { color: species.palette.accent }]}>{a}</Text>
-              </View>
-            ))}
           </View>
         </View>
 

@@ -94,16 +94,6 @@ export default function ResultsRoute() {
           ))}
         </View>
 
-        {/* Food allergies is the one Q5 answer we cannot act on — we never
-            asked which ones, and guessing would be dangerous. So it changes
-            what we say rather than what we recommend. */}
-        {hasAllergyFlag(effective.restrictions) && (
-          <View style={styles.caveat}>
-            <Icon name="info-outline" size={18} color={colors.onSecondaryContainer} />
-            <Text style={styles.caveatText}>{ALLERGY_CAVEAT}</Text>
-          </View>
-        )}
-
         {/* One way on, and it is not "add everything".
             Adding lives on each nutrient's own page, where there is enough
             context to decide — and bulk-adding five nutrients produced a
@@ -158,20 +148,6 @@ const styles = StyleSheet.create({
     opacity: 0.8,
   },
   cards: { gap: spacing.stackMd },
-  caveat: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    gap: spacing.stackSm,
-    marginTop: spacing.stackMd,
-    padding: spacing.cardPaddingSm,
-    borderRadius: radius.md,
-    backgroundColor: colors.tintGold,
-  },
-  caveatText: {
-    ...typography.caption,
-    color: colors.ink,
-    flex: 1,
-  },
   actions: {
     marginTop: spacing.stackLg,
     gap: spacing.stackMd,

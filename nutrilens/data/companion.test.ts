@@ -27,6 +27,14 @@ test('HP never falls below the floor, however long you are away', () => {
   assert.equal(decayCare(CARE.FLOOR, 10), CARE.FLOOR);
 });
 
+test('a new pal starts at half, so the first tick is visible', () => {
+  // Starting at MAX means the first thing anyone ever does to the pal produces
+  // no change at all — the worst possible first impression of the mechanic.
+  assert.ok(CARE.START < CARE.MAX);
+  assert.ok(CARE.START > CARE.FLOOR);
+  assert.equal(CARE.START + CARE.RECOVER <= CARE.MAX, true);
+});
+
 test('no elapsed days is no decay', () => {
   assert.equal(decayCare(64, 0), 64);
   assert.equal(decayCare(64, -3), 64);

@@ -133,8 +133,18 @@ export function tokensToNextStage(tokens: number): number {
  * three numbers to change, and they are all here.
  */
 export const CARE = {
-  /** Starting and maximum value. */
+  /** The ceiling. */
   MAX: 100,
+  /**
+   * Where a new pal starts.
+   *
+   * Half, not full. A pal that begins at 100% has nowhere to go, so the first
+   * thing you ever do to it — tick something off — produces no visible change
+   * at all. Starting at half means the heart visibly fills the first time you
+   * log a supplement, which is the entire mechanic and the thing a demo has to
+   * show in one tap.
+   */
+  START: 50,
   /**
    * The lowest care can ever go. A dull, sleepy creature — never a dead one,
    * and never a screen that says you failed.

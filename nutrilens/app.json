@@ -19,7 +19,9 @@
       "predictiveBackGestureEnabled": false
     },
     "web": {
-      "favicon": "./assets/favicon.png"
+      "favicon": "./assets/favicon.png",
+      "output": "static",
+      "bundler": "metro"
     },
     "plugins": [
       "expo-router",
@@ -32,9 +34,9 @@
       "typedRoutes": true
     },
     "splash": {
-      "image": "./assets/brand/vito-idle.png",
+      "image": "./assets/splash-icon.png",
       "resizeMode": "contain",
-      "backgroundColor": "#FAF7F0"
+      "backgroundColor": "#f8f9ff"
     }
   }
 }
