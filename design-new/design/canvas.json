@@ -1,0 +1,9 @@
+{
+  "pages": [{ "id": "page-1", "name": "Home" }, { "id": "page-2", "name": "Explorations" }],
+  "artboards": [
+    { "file": "Main.dc.html", "title": "Home", "x": 0, "y": 0, "w": 393, "h": 1200, "page": "page-1" },
+    { "file": "Editorial.dc.html", "title": "Editorial", "x": 0, "y": 0, "w": 393, "h": 1200, "page": "page-2" },
+    { "file": "Brutalist.dc.html", "title": "Brutalist", "x": 500, "y": 0, "w": 393, "h": 1200, "page": "page-2" }
+  ],
+  "launch": { "view": "canvas", "page": "page-1" }
+}

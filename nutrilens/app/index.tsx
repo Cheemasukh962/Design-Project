@@ -36,6 +36,11 @@ export default function SplashRoute() {
 
         <View style={styles.actions}>
           <Button
+            label="Try the new VitaPal demo"
+            variant="tertiary"
+            onPress={() => router.push('/demo')}
+          />
+          <Button
             label="Take the quiz"
             variant="primary"
             onPress={() => router.push('/quiz/q1')}
