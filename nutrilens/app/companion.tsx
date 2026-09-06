@@ -1,14 +1,15 @@
 import { router } from 'expo-router';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { CareMeter } from '../components/companion/CareMeter';
+import { GrowthTrack } from '../components/companion/GrowthTrack';
 import { Creature } from '../components/companion/Creature';
 import { Icon } from '../components/ui/Icon';
 import { Screen } from '../components/ui/Screen';
 import {
+  CARE,
   SPECIES,
   STAGE_THRESHOLDS,
   moodLine,
-  stageProgress,
   tokensToNextStage,
 } from '../data/companion';
 import { useCompanion } from '../data/CompanionContext';
@@ -39,7 +40,7 @@ export default function CompanionRoute() {
   } = useCompanion();
 
   // Hold a blank night ground until storage is read, so the screen never
-  // flashes the "no buddy" state at someone who already has one.
+  // flashes the "no pal" state at someone who already has one.
   if (!hydrated) {
     return (
       <Screen background="night">
@@ -52,7 +53,7 @@ export default function CompanionRoute() {
     return (
       <Screen background="night">
         <View style={styles.empty}>
-          <Text style={styles.emptyTitle}>No buddy yet</Text>
+          <Text style={styles.emptyTitle}>No pal yet</Text>
           <Text style={styles.emptyBody}>
             Pick one and it starts growing with your routine.
           </Text>
@@ -61,7 +62,7 @@ export default function CompanionRoute() {
             onPress={() => router.push('/starter')}
             style={styles.emptyCta}
           >
-            <Text style={styles.emptyCtaLabel}>Pick your buddy</Text>
+            <Text style={styles.emptyCtaLabel}>Pick your pal</Text>
           </Pressable>
         </View>
       </Screen>
@@ -70,7 +71,6 @@ export default function CompanionRoute() {
 
   const species = SPECIES[speciesId];
   const name = species.names[stage];
-  const progress = stageProgress(tokens);
   const toNext = tokensToNextStage(tokens);
   const maxed = stage === 2;
 
@@ -85,7 +85,7 @@ export default function CompanionRoute() {
         >
           <Icon name="arrow-back" size={24} color={companion.onNight} />
         </Pressable>
-        <Text style={styles.barTitle}>Your buddy</Text>
+        <Text style={styles.barTitle}>Your pal</Text>
         <View style={styles.back} />
       </View>
 
@@ -100,67 +100,44 @@ export default function CompanionRoute() {
         </Text>
         <Text style={styles.mood}>{moodLine(speciesId, mood)}</Text>
 
-        {/* ---- Care and tokens ---- */}
-        <View style={styles.statRow}>
-          <View style={styles.statCard}>
-            <CareMeter care={care} fill={species.palette.base} />
+        {/* ---- HP ----
+            The headline stat. Growth is a fortnight away and cannot answer
+            "did today matter"; this can, so it goes first and it gets the
+            space. The rule underneath is printed rather than discovered,
+            because a meter whose mechanics are hidden just feels arbitrary. */}
+        <View style={styles.hpPanel}>
+          <CareMeter
+            care={care}
+            fill={species.palette.base}
+            size={96}
+            showValue={false}
+          />
+          <View style={styles.hpText}>
+            <Text style={styles.hpValue}>{Math.round(care)}%</Text>
+            <Text style={styles.hpTitle}>HP</Text>
+            <Text style={styles.hpRule}>
+              Tick anything today: +{CARE.RECOVER}. Skip a day: −{CARE.DECAY}.
+            </Text>
+            <Text style={styles.hpFloor}>Never below {CARE.FLOOR}%. {name} cannot die.</Text>
           </View>
-          <View style={styles.statCard}>
-            <View style={styles.tokenRow}>
-              <Icon name="bolt" size={22} color={species.palette.accent} />
-              <View>
-                <Text style={styles.statValue}>{tokens}</Text>
-                <Text style={styles.statLabel}>Tokens</Text>
-              </View>
-            </View>
-          </View>
+        </View>
+
+        <View style={styles.tokenPanel}>
+          <Icon name="bolt" size={18} color={species.palette.accent} />
+          <Text style={styles.tokenValue}>{tokens}</Text>
+          <Text style={styles.tokenLabel}>tokens earned</Text>
         </View>
 
         {/* ---- Growth ---- */}
         <View style={styles.panel}>
-          <View style={styles.panelHead}>
-            <Text style={styles.panelTitle}>Growth</Text>
-            <Text style={styles.panelMeta}>
-              {maxed
-                ? 'Fully grown'
-                : `${toNext} more ${toNext === 1 ? 'tick' : 'ticks'} to evolve`}
-            </Text>
-          </View>
-
-          <View style={styles.track}>
-            <View
-              style={[
-                styles.fill,
-                { width: `${Math.round(progress * 100)}%`, backgroundColor: species.palette.base },
-              ]}
-            />
-          </View>
-
-          <View style={styles.pips}>
-            {species.names.map((n, i) => (
-              <View key={n} style={styles.pip}>
-                <View
-                  style={[
-                    styles.pipDot,
-                    i <= stage && { backgroundColor: species.palette.base, borderColor: species.palette.base },
-                  ]}
-                />
-                <Text style={[styles.pipLabel, i <= stage && { color: companion.onNight }]}>
-                  {n}
-                </Text>
-                <Text style={styles.pipCost}>{STAGE_THRESHOLDS[i]}</Text>
-              </View>
-            ))}
-          </View>
+          <GrowthTrack speciesId={speciesId} stage={stage} tokens={tokens} title="Growth" />
         </View>
 
         {/* ---- Where tokens come from ---- */}
         <View style={styles.panel}>
           <Text style={styles.panelTitle}>How it grows</Text>
           <Text style={styles.panelBody}>
-            One token for each thing you tick off your routine. Nothing else earns
-            them — no bonus for opening the app, and re-ticking something you
-            already did does not count twice.
+            One token per item you tick off. Nothing else earns them.
           </Text>
           <View style={styles.affinity}>
             {species.affinity.map((a) => (
@@ -250,6 +227,43 @@ const styles = StyleSheet.create({
   tokenRow: { flexDirection: 'row', alignItems: 'center', gap: 10 },
   statValue: { ...typography.h3, color: companion.onNight },
   statLabel: { ...typography.micro, letterSpacing: 0, color: companion.onNightMuted },
+  hpPanel: {
+    width: '100%',
+    marginTop: spacing.stackMd,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.stackMd,
+    padding: spacing.cardPaddingSm,
+    borderRadius: radius.md,
+    backgroundColor: companion.nightRaised,
+    borderWidth: 1,
+    borderColor: companion.nightLine,
+  },
+  hpText: { flex: 1 },
+  hpValue: { ...typography.h1Mobile, color: companion.onNight },
+  hpTitle: {
+    ...typography.micro,
+    letterSpacing: 1,
+    color: companion.onNightMuted,
+    marginBottom: spacing.base,
+  },
+  hpRule: { ...typography.caption, color: companion.onNight },
+  hpFloor: { ...typography.micro, letterSpacing: 0, color: companion.onNightMuted, marginTop: 2 },
+  tokenPanel: {
+    width: '100%',
+    marginTop: spacing.stackSm,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.stackSm,
+    paddingVertical: spacing.stackSm,
+    paddingHorizontal: spacing.cardPaddingSm,
+    borderRadius: radius.md,
+    backgroundColor: companion.nightRaised,
+    borderWidth: 1,
+    borderColor: companion.nightLine,
+  },
+  tokenValue: { ...typography.h3, color: companion.onNight },
+  tokenLabel: { ...typography.caption, color: companion.onNightMuted },
   panel: {
     width: '100%',
     marginTop: spacing.stackMd,

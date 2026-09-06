@@ -1,12 +1,16 @@
 import { router } from 'expo-router';
+import { useCallback } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { GrowthTrack } from '../../components/companion/GrowthTrack';
+import { Accordion } from '../../components/ui/Accordion';
+import { ProfileHero } from '../../components/profile/ProfileHero';
 import { Icon, type IconName } from '../../components/ui/Icon';
 import { Screen } from '../../components/ui/Screen';
 import { useQuiz } from '../../data/QuizContext';
-import { ACCOUNT, PROFILE, SEED_DEMO_ROUTINE } from '../../data/progress';
+import { PROFILE } from '../../data/progress';
+import { useWipeAll } from '../../data/storage';
 import { useCompanion } from '../../data/CompanionContext';
 import { SPECIES } from '../../data/companion';
-import { useRoutine } from '../../data/RoutineContext';
 import { colors, radius, spacing, typography } from '../../theme';
 
 /**
@@ -17,20 +21,47 @@ import { colors, radius, spacing, typography } from '../../theme';
  *
  * There is no account system, so this deliberately does not pretend to be an
  * account screen. It shows the demo persona, the two real controls that exist
- * (retake the quiz, clear the routine), and an honest note about what is and
+ * (retake the quiz, start the pal over), and an honest note about what is and
  * is not stored. The note is the useful part: a tester who taps here should
  * find out that nothing persists rather than assume it does.
+ *
+ * WHAT "LIFETIME" IS ALLOWED TO MEAN HERE. The old stat row was headed "This
+ * session" and counted routine items and ticks. Those numbers are real, but
+ * they die on the next launch, and they restate what the Routine tab already
+ * shows with a ring and a week strip — the same duplicate-progress problem that
+ * was removed from Home. The companion is the only state that survives a
+ * relaunch, so it is the only thing that can honestly sit under a heading
+ * saying "lifetime". Care is the one current reading in the group, and its
+ * label says so.
  */
 export default function ProfileRoute() {
   const { reset } = useQuiz();
-  const { added, items, done } = useRoutine();
+  const wipeAll = useWipeAll();
   const {
     speciesId,
     tokens,
+    care,
     stage,
     reset: resetCompanion,
   } = useCompanion();
   const species = speciesId ? SPECIES[speciesId] : null;
+
+  /**
+   * Back to a genuine first run.
+   *
+   * Needed because the example routine is seeded only when storage is empty,
+   * so the seeded state — the one both mocks draw — becomes unreachable the
+   * moment anything has been saved. Sending the user back to the splash after
+   * the wipe also remounts every provider, which is what makes the cleared
+   * state actually appear.
+   */
+  const onReset = useCallback(() => {
+    wipeAll().then(() => {
+      reset();
+      resetCompanion();
+      router.replace('/');
+    });
+  }, [wipeAll, reset, resetCompanion]);
 
   return (
     <Screen>
@@ -39,87 +70,109 @@ export default function ProfileRoute() {
           Profile
         </Text>
 
-        <View style={styles.card}>
-          <View style={styles.avatar}>
-            <Text style={styles.avatarLetter}>{PROFILE.initial}</Text>
-          </View>
-          <View style={styles.who}>
-            <Text style={styles.name}>{PROFILE.name}</Text>
-            <Text style={styles.meta}>
-              Level {ACCOUNT.level} · {ACCOUNT.xp} XP
-            </Text>
-          </View>
+        <View style={styles.hero}>
+          <ProfileHero
+            name={PROFILE.name}
+            initial={PROFILE.initial}
+            onOpen={() => router.push('/companion')}
+            onPick={() => router.push('/starter')}
+          />
         </View>
 
-        <View style={styles.notice}>
-          <Icon name="info-outline" size={18} color={colors.onSecondaryContainer} />
-          <Text style={styles.noticeText}>
-            Sample profile. There are no accounts in this build, and nothing is
-            saved when the app closes — including your quiz answers and anything
-            ticked off today. Your buddy is the one exception: it is stored on
-            this device, because a care meter that resets every launch measures
-            nothing.
-            {SEED_DEMO_ROUTINE
-              ? ' The routine starts pre-filled with example items; the switch is SEED_DEMO_ROUTINE in data/progress.ts.'
-              : ''}
+        {/* White, not navy. With the hero above it already dark, a second
+            dark block made the screen read as navy-white-navy stripes. The
+            track switches to brand navy on light so no elemental colour lands
+            on a light surface. */}
+        <Text style={styles.section}>Lifetime stats</Text>
+        <View style={styles.statCard}>
+          <View style={styles.stats}>
+            <Stat icon="bolt" label="Tokens earned" value={String(tokens)} />
+            <Stat icon="auto-awesome" label="Growth stage" value={stage + 1 + "/3"} />
+            <Stat icon="favorite-border" label="Care right now" value={Math.round(care) + "%"} />
+          </View>
+
+          {speciesId && (
+            <GrowthTrack speciesId={speciesId} stage={stage} tokens={tokens} tone="light" />
+          )}
+
+          <Text style={styles.statNote}>
+            One token for every routine item you tick off. Tokens never go down,
+            and re-ticking something does not count twice.
           </Text>
         </View>
 
-        <Text style={styles.section}>This session</Text>
-        <View style={styles.stats}>
-          <Stat label="Nutrients tracked" value={String(added.length)} />
-          <Stat label="Routine items" value={String(items.length)} />
-          <Stat label="Ticked today" value={String(done.length)} />
-        </View>
+        {/* A dropdown, not a grid of tiles.
+            Four square tiles fitted on the screen and lost the sentence that
+            made each one legible — "Not medical advice" wrapped to two lines
+            inside an 80px box, and "New pal" gave no hint that it destroys
+            weeks of progress. Collapsed the section costs one line; open, the
+            rows have room to say what they do. */}
+        <View style={styles.actions}>
+          <Accordion title="Actions" meta="5 things">
+            <View style={styles.stack}>
+              <Row
+                icon="undo"
+                label="Retake the quiz"
+                detail="Clears your answers and starts again"
+                onPress={() => {
+                  reset();
+                  router.push('/quiz/q1');
+                }}
+              />
 
-        <Text style={styles.section}>Actions</Text>
-        <View style={styles.stack}>
-          <Row
-            icon="undo"
-            label="Retake the quiz"
-            detail="Clears your answers and starts again"
-            onPress={() => {
-              reset();
-              router.push('/quiz/q1');
-            }}
-          />
-          <Row
-            icon="help-outline"
-            label="How this works"
-            detail="The rules behind your results"
-          />
-          {species ? (
-            <Row
-              icon="undo"
-              label={`Start over with ${species.names[stage]}`}
-              detail={`Clears ${tokens} ${tokens === 1 ? 'token' : 'tokens'} and lets you pick again`}
-              onPress={() => {
-                resetCompanion();
-                router.push('/starter');
-              }}
-            />
-          ) : (
-            <Row
-              icon="person"
-              label="Pick your buddy"
-              detail="Three to choose from"
-              onPress={() => router.push('/starter')}
-            />
-          )}
-          <Row
-            icon="open-in-new"
-            label="Not medical advice"
-            detail="What this app can and cannot tell you"
-          />
+              {species ? (
+                <Row
+                  icon="person"
+                  label={`Start over with ${species.names[stage]}`}
+                  detail={`Clears ${tokens} ${tokens === 1 ? 'token' : 'tokens'} and lets you pick again`}
+                  onPress={() => {
+                    resetCompanion();
+                    router.push('/starter');
+                  }}
+                />
+              ) : (
+                <Row
+                  icon="person"
+                  label="Pick your pal"
+                  detail="Three to choose from"
+                  onPress={() => router.push('/starter')}
+                />
+              )}
+
+              <Row
+                icon="help-outline"
+                label="How this works"
+                detail="The rules behind your results"
+                onPress={() => router.push('/how-it-works')}
+              />
+
+              <Row
+                icon="open-in-new"
+                label="Not medical advice"
+                detail="What this app can and cannot tell you"
+                onPress={() => router.push('/disclaimer')}
+              />
+
+              {/* Everything lives on this device and nothing is uploaded, so
+                  the only thing to say about storage is how to clear it. */}
+              <Row
+                icon="remove"
+                label="Reset demo"
+                detail="Clears everything stored on this device"
+                onPress={onReset}
+              />
+            </View>
+          </Accordion>
         </View>
       </ScrollView>
     </Screen>
   );
 }
 
-function Stat({ label, value }: { label: string; value: string }) {
+function Stat({ icon, label, value }: { icon: IconName; label: string; value: string }) {
   return (
     <View style={styles.stat}>
+      <Icon name={icon} size={18} color={colors.secondary} />
       <Text style={styles.statValue}>{value}</Text>
       <Text style={styles.statLabel}>{label}</Text>
     </View>
@@ -144,7 +197,9 @@ function Row({
       onPress={onPress}
       style={({ pressed }) => [styles.row, pressed && styles.pressed]}
     >
-      <Icon name={icon} size={20} color={colors.aggieBlue} />
+      <View style={styles.rowGlyph}>
+        <Icon name={icon} size={18} color={colors.aggieBlue} />
+      </View>
       <View style={styles.rowText}>
         <Text style={styles.rowTitle}>{label}</Text>
         <Text style={styles.rowBody}>{detail}</Text>
@@ -164,36 +219,7 @@ const styles = StyleSheet.create({
     color: colors.primary,
     marginBottom: spacing.stackMd,
   },
-  card: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.stackMd,
-    padding: spacing.cardPaddingLg,
-    borderRadius: radius.md,
-    backgroundColor: colors.surfaceContainerLowest,
-    marginBottom: spacing.stackMd,
-  },
-  avatar: {
-    width: 56,
-    height: 56,
-    borderRadius: radius.full,
-    backgroundColor: colors.aggieBlue,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  avatarLetter: {
-    ...typography.h2,
-    color: colors.onPrimary,
-  },
-  who: { flex: 1, gap: 2 },
-  name: {
-    ...typography.h3,
-    color: colors.onSurface,
-  },
-  meta: {
-    ...typography.caption,
-    color: colors.onSurfaceVariant,
-  },
+  hero: { marginBottom: spacing.stackMd },
   notice: {
     flexDirection: 'row',
     alignItems: 'flex-start',
@@ -202,10 +228,15 @@ const styles = StyleSheet.create({
     borderRadius: radius.md,
     backgroundColor: colors.tintGold,
   },
+  noticeBody: { flex: 1, gap: spacing.stackSm },
   noticeText: {
     ...typography.caption,
     color: colors.ink,
-    flex: 1,
+  },
+  noticeAction: {
+    ...typography.caption,
+    fontFamily: typography.h3.fontFamily,
+    color: colors.aggieBlue,
   },
   section: {
     ...typography.h3,
@@ -213,21 +244,37 @@ const styles = StyleSheet.create({
     marginTop: spacing.stackLg,
     marginBottom: spacing.stackSm,
   },
+  statCard: {
+    padding: spacing.cardPaddingLg,
+    borderRadius: radius.md,
+    backgroundColor: colors.surfaceContainerLowest,
+    borderWidth: 1,
+    borderColor: colors.cardEdge,
+    gap: spacing.stackMd,
+    alignItems: 'flex-start',
+  },
   stats: {
     flexDirection: 'row',
-    gap: spacing.stackSm,
+    alignSelf: 'stretch',
   },
   stat: {
     flex: 1,
     alignItems: 'center',
     gap: 2,
-    paddingVertical: spacing.cardPaddingSm,
-    borderRadius: radius.md,
-    backgroundColor: colors.surfaceContainerLowest,
   },
   statValue: {
     ...typography.h2,
     color: colors.aggieBlue,
+  },
+  statNote: {
+    ...typography.caption,
+    color: colors.onSurfaceVariant,
+  },
+  reset: {
+    ...typography.caption,
+    color: colors.outline,
+    marginTop: spacing.stackMd,
+    textAlign: 'center',
   },
   statLabel: {
     ...typography.micro,
@@ -235,15 +282,26 @@ const styles = StyleSheet.create({
     color: colors.onSurfaceVariant,
     textAlign: 'center',
   },
+  actions: { marginTop: spacing.stackSm },
   stack: { gap: spacing.stackSm },
   row: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: spacing.base * 3,
-    minHeight: 64,
+    gap: spacing.stackMd,
+    minHeight: 60,
     padding: spacing.cardPaddingSm,
     borderRadius: radius.md,
     backgroundColor: colors.surfaceContainerLowest,
+    borderWidth: 1,
+    borderColor: colors.cardEdge,
+  },
+  rowGlyph: {
+    width: 34,
+    height: 34,
+    borderRadius: radius.full,
+    backgroundColor: colors.surfaceContainer,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   pressed: { backgroundColor: '#FCFDFF' },
   rowText: { flex: 1, gap: 2 },

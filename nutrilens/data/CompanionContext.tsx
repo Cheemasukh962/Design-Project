@@ -33,13 +33,21 @@ type Persisted = {
   /** Date-only ISO of the last day care was updated. */
   lastDay: string;
   /**
-   * Routine item ids that have already paid out a token.
+   * Routine item ids that have already paid out a token TODAY.
    *
-   * Without this, un-ticking and re-ticking the same item is an infinite token
+   * Without it, un-ticking and re-ticking the same item is an infinite token
    * farm — which would make the currency meaningless and, worse, reward
    * fiddling with the checklist rather than doing the thing.
+   *
+   * The "today" part is load-bearing and was missing. This list used to grow
+   * forever, so a routine item paid out exactly once in its life: a five-item
+   * routine could earn five tokens total, the second form costs fifteen and
+   * the third costs fifty, and the pal could therefore never evolve at all.
+   * The whole daily loop was unreachable. It resets with `rewardedDay`.
    */
   rewarded: string[];
+  /** The day `rewarded` refers to. */
+  rewardedDay: string;
   /** Highest stage the user has actually been shown, for the reveal moment. */
   seenStage: Stage;
 };
@@ -50,6 +58,7 @@ const EMPTY: Persisted = {
   care: CARE.MAX,
   lastDay: today(),
   rewarded: [],
+  rewardedDay: today(),
   seenStage: 0,
 };
 
@@ -59,6 +68,8 @@ type CompanionStore = {
   speciesId: SpeciesId | null;
   tokens: number;
   care: number;
+  /** Set when HP was just gained, so the UI can celebrate a check-in. */
+  lastGain: { at: number; amount: number } | null;
   stage: Stage;
   mood: Mood;
   /** Set when the creature has evolved but the user has not seen the reveal. */
@@ -86,6 +97,14 @@ export function CompanionProvider({ children }: { children: ReactNode }) {
   const [state, setState] = useState<Persisted>(EMPTY);
   const [hydrated, setHydrated] = useState(false);
   const [pendingEvolution, setPendingEvolution] = useState(false);
+  /**
+   * The last time HP was gained, and how much.
+   *
+   * Exposed so a screen can react to a check-in rather than poll for it. The
+   * timestamp is the signal — a plain boolean could not distinguish two ticks
+   * in a row, which is exactly the case worth animating.
+   */
+  const [lastGain, setLastGain] = useState<{ at: number; amount: number } | null>(null);
   const { done } = useRoutine();
 
   // ---- Load, and apply any decay that happened while the app was closed ----
@@ -103,6 +122,10 @@ export function CompanionProvider({ children }: { children: ReactNode }) {
           const missed = daysBetween(saved.lastDay, today());
           setState({
             ...saved,
+            // A new day is a clean slate for earning, so the same routine can
+            // pay again tomorrow.
+            rewarded: saved.rewardedDay === today() ? saved.rewarded : [],
+            rewardedDay: today(),
             // Decay is computed from elapsed days on load rather than by a
             // timer, because a timer only runs while the app is open — which
             // is precisely when the user is not neglecting anything.
@@ -134,9 +157,13 @@ export function CompanionProvider({ children }: { children: ReactNode }) {
   const prevStage = useRef<Stage>(0);
   useEffect(() => {
     if (!hydrated || !state.speciesId) return;
-    const fresh = done.filter((id) => !state.rewarded.includes(id));
+    // Anything ticked today that has not already paid out today.
+    const sameDay = state.rewardedDay === today();
+    const alreadyPaid = sameDay ? state.rewarded : [];
+    const fresh = done.filter((id) => !alreadyPaid.includes(id));
     if (fresh.length === 0) return;
 
+    setLastGain({ at: Date.now(), amount: CARE.RECOVER });
     setState((s) => {
       const tokens = s.tokens + fresh.length * TOKENS_PER_ITEM;
       return {
@@ -146,11 +173,12 @@ export function CompanionProvider({ children }: { children: ReactNode }) {
         // deliberately larger than a day's decay, so one good day undoes
         // several bad ones and the meter never becomes a hole to climb out of.
         care: Math.min(CARE.MAX, s.care + CARE.RECOVER),
-        rewarded: [...s.rewarded, ...fresh],
+        rewarded: [...alreadyPaid, ...fresh],
+        rewardedDay: today(),
         lastDay: today(),
       };
     });
-  }, [done, hydrated, state.speciesId, state.rewarded]);
+  }, [done, hydrated, state.speciesId, state.rewarded, state.rewardedDay]);
 
   const stage = stageForTokens(state.tokens);
 
@@ -164,7 +192,13 @@ export function CompanionProvider({ children }: { children: ReactNode }) {
   }, [stage, hydrated, state.seenStage]);
 
   const choose = useCallback((id: SpeciesId) => {
-    setState((s) => ({ ...s, speciesId: id, care: CARE.MAX, lastDay: today() }));
+    setState((s) => {
+      // The quiz now ends here every time, so this runs on people who already
+      // have a pal. Re-confirming the one you have must not top the care meter
+      // back up — that would make re-running the quiz a way to undo neglect.
+      if (s.speciesId === id) return s;
+      return { ...s, speciesId: id, care: CARE.MAX, lastDay: today() };
+    });
   }, []);
 
   const acknowledgeEvolution = useCallback(() => {
@@ -184,6 +218,7 @@ export function CompanionProvider({ children }: { children: ReactNode }) {
       speciesId: state.speciesId,
       tokens: state.tokens,
       care: state.care,
+      lastGain,
       stage,
       mood: moodForCare(state.care),
       pendingEvolution,
@@ -191,7 +226,7 @@ export function CompanionProvider({ children }: { children: ReactNode }) {
       acknowledgeEvolution,
       reset,
     }),
-    [hydrated, state, stage, pendingEvolution, choose, acknowledgeEvolution, reset],
+    [hydrated, state, stage, lastGain, pendingEvolution, choose, acknowledgeEvolution, reset],
   );
 
   return (

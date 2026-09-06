@@ -4,6 +4,7 @@ import { useCompanion } from '../../data/CompanionContext';
 import { companion } from '../../theme/companion';
 import { radius, spacing, typography } from '../../theme';
 import { Icon } from '../ui/Icon';
+import { CareMeter } from '../companion/CareMeter';
 import { Creature } from '../companion/Creature';
 
 type Props = {
@@ -28,20 +29,20 @@ export function CompanionCard({ onOpen, onPick }: Props) {
   const { hydrated, speciesId, tokens, care, stage, mood } = useCompanion();
 
   // Nothing until storage has been read, so the card never flashes the
-  // "pick a buddy" prompt at someone who already has one.
+  // "pick a pal" prompt at someone who already has one.
   if (!hydrated) return <View style={styles.placeholder} />;
 
   if (!speciesId) {
     return (
       <Pressable
         accessibilityRole="button"
-        accessibilityLabel="Pick your buddy"
+        accessibilityLabel="Pick your pal"
         onPress={onPick}
         style={({ pressed }) => [styles.card, pressed && styles.pressed]}
       >
         <Creature species="sprout" stage={0} size={72} glow={false} animate />
         <View style={styles.text}>
-          <Text style={styles.name}>Pick your buddy</Text>
+          <Text style={styles.name}>Pick your pal</Text>
           <Text style={styles.line}>
             Three to choose from. It grows as you keep up your routine.
           </Text>
@@ -76,19 +77,13 @@ export function CompanionCard({ onOpen, onPick }: Props) {
             <Icon name="bolt" size={13} color={species.palette.accent} />
             <Text style={styles.metaText}>{tokens}</Text>
           </View>
-          <View style={styles.metaItem}>
-            <Icon name="favorite-border" size={13} color={species.palette.accent} />
-            <Text style={styles.metaText}>{Math.round(care)}%</Text>
-          </View>
-          {toNext > 0 && (
-            <Text style={styles.metaText}>
-              {toNext} to evolve
-            </Text>
-          )}
+          {toNext > 0 && <Text style={styles.metaText}>{toNext} to evolve</Text>}
         </View>
       </View>
 
-      <Icon name="chevron-right" size={22} color={companion.onNightMuted} />
+      {/* The HP heart takes the chevron's place: the card is tappable anyway,
+          and a number that moves daily is worth more than an affordance hint. */}
+      <CareMeter care={care} fill={species.palette.accent} size={46} layout="stack" />
     </Pressable>
   );
 }
