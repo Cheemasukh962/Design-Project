@@ -110,10 +110,12 @@ export const STREAK_DAYS = 5;
 export const WEEK_COMPLETED = [0, 1, 2];
 
 /** "Learn more" cards on Home and the Discover tab. Titles only; no articles exist. */
-export const ARTICLES = [
-  { id: 'b12-campus', title: 'Why B12 matters on a campus diet', meta: '3 min read', tint: colors.tintBlue },
-  { id: 'russell-produce', title: 'Cheap produce near Russell Blvd', meta: 'Guide', tint: colors.tintNeutral },
-] as const;
+/**
+ * Reading pieces moved to data/articles.ts when they stopped being two titles
+ * and became actual writing. Re-exported so nothing that imported them from
+ * here breaks.
+ */
+export { ARTICLES } from './articles';
 
 /**
  * Demo seed for the routine store.
@@ -130,10 +132,15 @@ export const ARTICLES = [
 export const SEED_DEMO_ROUTINE = true;
 
 /** Nutrients pre-added when the seed is on. */
-export const SEED_NUTRIENTS = ['d', 'b12'];
+/**
+ * Routes the demo starts with. Supplements plus one habit, so the seeded
+ * routine looks like something a person would actually assemble rather than
+ * every suggestion the catalogue has for two nutrients.
+ */
+export const SEED_PICKS = ['d-0', 'd-1', 'b12-0', 'c-0'];
 
 /** Routine item ids pre-ticked when the seed is on. Ids are `<nutrient>-<index>`. */
-export const SEED_DONE = ['d-0', 'd-1', 'd-2'];
+export const SEED_DONE = ['d-0', 'b12-0'];
 
 /**
  * The mascot tip on the routine tracker.

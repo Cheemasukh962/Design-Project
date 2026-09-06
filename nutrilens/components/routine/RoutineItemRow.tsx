@@ -9,6 +9,8 @@ type Props = {
   onToggle: () => void;
   reminderOn?: boolean;
   onToggleReminder?: () => void;
+  /** Drops this suggestion from the routine. */
+  onRemove?: () => void;
 };
 
 const TYPE_LABEL: Record<RoutineItemType, string> = {
@@ -50,6 +52,7 @@ export function RoutineItemRow({
   onToggle,
   reminderOn = false,
   onToggleReminder,
+  onRemove,
 }: Props) {
   const chip = TYPE_CHIP[item.type];
 
@@ -109,13 +112,17 @@ export function RoutineItemRow({
         />
       </Pressable>
 
+      {/* The overflow menu opened nothing, so it is a remove button now. One
+          visible action beats a hidden menu with one item in it. */}
       {done ? (
         <Pressable
           accessibilityRole="button"
-          accessibilityLabel={`Options for ${item.title}`}
+          accessibilityLabel={`Remove ${item.title} from your routine`}
+          onPress={onRemove}
+          hitSlop={6}
           style={({ pressed }) => [styles.more, pressed && styles.morePressed]}
         >
-          <Icon name="more-vert" size={20} color={colors.outline} />
+          <Icon name="remove" size={20} color={colors.outline} />
         </Pressable>
       ) : (
         <Pressable
@@ -141,6 +148,8 @@ const styles = StyleSheet.create({
     borderRadius: radius.md,
     borderLeftWidth: 4,
     backgroundColor: colors.surfaceContainerLowest,
+    borderWidth: 1,
+    borderColor: colors.cardEdge,
     shadowColor: '#435f8b',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.04,
@@ -151,7 +160,7 @@ const styles = StyleSheet.create({
     borderTopWidth: 2,
     borderRightWidth: 2,
     borderBottomWidth: 2,
-    borderColor: colors.primaryFixed,
+    borderBottomColor: colors.primaryFixed,
     borderLeftWidth: 4,
   },
   main: {

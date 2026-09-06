@@ -2,27 +2,69 @@ import {
   createContext,
   useCallback,
   useContext,
+  useEffect,
   useMemo,
   useState,
   type ReactNode,
 } from 'react';
-import { SEED_DEMO_ROUTINE, SEED_DONE, SEED_NUTRIENTS } from './progress';
+import { syncDailyReminder, type ReminderStatus } from './reminders';
+import { SEED_DEMO_ROUTINE, SEED_DONE, SEED_PICKS } from './progress';
 import { useQuiz } from './QuizContext';
+import { KEYS, today, usePersistentState } from './storage';
+import {
+  ALL_OPTIONS,
+  nutrientsIn,
+  resolveItems,
+  streakFrom,
+  supplementOption,
+  type RoutineItem,
+  type RoutineItemType,
+} from './routine';
 
-export type RoutineItemType = 'supplement' | 'food' | 'habit';
+// Re-exported so callers keep importing routine types from one place.
+export {
+  ALL_OPTIONS,
+  supplementOption,
+  type RoutineItem,
+  type RoutineItemType,
+  type RoutineOption,
+} from './routine';
 
-export type RoutineItem = {
-  id: string;
-  /** Nutrient this item serves, when it came from a result. */
-  nutrientId?: string;
-  title: string;
-  detail: string;
-  type: RoutineItemType;
+/** The one record written to storage. */
+type Persisted = {
+  /**
+   * The exact routes the user chose, by id.
+   *
+   * This replaced an `added` list of nutrients plus a `hidden` list of the
+   * rows they did not want. Adding one nutrient used to drop three rows into
+   * the routine — a pill, a meal and a habit — so a routine of three vitamins
+   * was nine lines the user never asked for, and pruning it meant removing
+   * things one at a time. Choosing what goes in is simpler than un-choosing
+   * what does not.
+   */
+  picks: string[];
+  done: string[];
+  reminders: string[];
+  /** Calendar day `done` belongs to. */
+  day: string;
+  /**
+   * How many items were ticked on each past day, keyed YYYY-MM-DD.
+   *
+   * This is what makes the week strip and the streak true. Both used to come
+   * from invented constants in data/progress.ts, so the app claimed a five-day
+   * streak to somebody who had opened it for the first time thirty seconds
+   * earlier — the single least defensible thing a habit tracker can do.
+   */
+  history: Record<string, number>;
 };
 
 type RoutineStore = {
-  /** Nutrient ids the user has added. */
+  /** Nutrient ids with at least one route in the routine. Derived. */
   added: string[];
+  /** The chosen route ids. */
+  picks: string[];
+  /** False until storage has been read. */
+  hydrated: boolean;
   items: RoutineItem[];
   done: string[];
   /**
@@ -35,69 +77,29 @@ type RoutineStore = {
    */
   reminders: string[];
   reminderTime: string;
+  /**
+   * What the OS actually did with the last sync.
+   *
+   * Surfaced so the interface can say "reminders are on" only when something
+   * is genuinely scheduled, and say something else when the browser cannot
+   * deliver one or the user declined the permission.
+   */
+  reminderStatus: ReminderStatus;
+  /** Ticks per day, keyed YYYY-MM-DD. Real, not seeded. */
+  history: Record<string, number>;
+  /** Consecutive days ending today with at least one tick. */
+  streak: number;
+  /** Adds the supplement route for a nutrient. The default meaning of "add". */
   add: (nutrientId: string) => void;
+  /** Adds one specific route — a food or a habit, chosen deliberately. */
+  addOption: (optionId: string) => void;
+  /** Drops every route belonging to a nutrient. */
   remove: (nutrientId: string) => void;
+  /** Drops a single row. */
+  removeItem: (itemId: string) => void;
   toggleDone: (itemId: string) => void;
   toggleReminder: (itemId: string) => void;
   remindAll: () => void;
-};
-
-/**
- * What a nutrient expands into once it is in the routine.
- *
- * A nutrient is not itself a thing you do, so adding one has to produce actual
- * actions. Each nutrient offers a food route and a habit route alongside the
- * supplement, because defaulting a 20-year-old to a pill for something a meal
- * would fix is the wrong instinct — and it is the reason the PRD warns against
- * a pill-shaped mascot.
- */
-type Expansion = Omit<RoutineItem, 'id' | 'nutrientId'> & {
-  /** Restriction ids that remove this item entirely. */
-  excludedBy?: string[];
-  /**
-   * Restriction id -> replacement title. Most items narrow rather than drop:
-   * telling someone who avoids dairy that calcium is simply unavailable to them
-   * would be both wrong and the opposite of useful, since they are exactly the
-   * person the finding was raised for.
-   */
-  narrows?: Record<string, string>;
-};
-
-const EXPANSIONS: Record<string, Expansion[]> = {
-  d: [
-    { title: 'Vitamin D3, 1,000 IU', detail: 'Morning, with food', type: 'supplement' },
-    { title: '15 minutes outside', detail: 'Around midday', type: 'habit' },
-    {
-      title: 'Salmon fillet or 2 eggs',
-      detail: 'Lunch or dinner',
-      type: 'food',
-      narrows: { 'no-fish': '2 eggs' },
-    },
-  ],
-  b12: [
-    {
-      title: 'Fortified cereal or nutritional yeast',
-      detail: 'Breakfast',
-      type: 'food',
-      narrows: { 'gluten-free': 'Gluten-free fortified cereal or nutritional yeast' },
-    },
-    { title: 'B12 supplement', detail: 'Morning', type: 'supplement' },
-  ],
-  c: [
-    { title: 'A piece of fruit', detail: 'Any time — it is not stored', type: 'food' },
-    { title: 'Peppers or greens with a meal', detail: 'Lunch or dinner', type: 'food' },
-  ],
-  iron: [
-    { title: 'Beans, lentils or leafy greens', detail: 'With something citrus', type: 'food' },
-  ],
-  calcium: [
-    {
-      title: 'Fortified milk or yoghurt',
-      detail: 'Breakfast',
-      type: 'food',
-      narrows: { 'no-dairy': 'Fortified plant milk, tofu or leafy greens' },
-    },
-  ],
 };
 
 /**
@@ -119,21 +121,87 @@ const RoutineContext = createContext<RoutineStore | null>(null);
 export function RoutineProvider({ children }: { children: ReactNode }) {
   // Seeded so the app opens in the populated state both mocks draw. The switch
   // lives in data/progress.ts — turn it off before a usability session.
-  const [added, setAdded] = useState<string[]>(
-    SEED_DEMO_ROUTINE ? [...SEED_NUTRIENTS] : [],
+  /**
+   * One stored record rather than three, so a tick and the day it happened on
+   * can never be written separately and disagree.
+   *
+   * `day` is what makes "ticked off" mean "ticked off today". Without it a
+   * routine opened the next morning would show yesterday's checkmarks and
+   * report itself complete, which is the one thing a daily checklist must not
+   * do. Tokens already earned are not clawed back — see CompanionContext.
+   */
+  const [state, setState, hydrated] = usePersistentState<Persisted>(
+    KEYS.routine,
+    // The demo seed is the value used when storage is empty, so it applies to
+    // a genuine first run and is not re-applied over real state afterwards.
+    SEED_DEMO_ROUTINE
+      ? {
+          picks: [...SEED_PICKS],
+          done: [...SEED_DONE],
+          reminders: [],
+          day: today(),
+          history: { [today()]: SEED_DONE.length },
+        }
+      : { picks: [], done: [], reminders: [], day: today(), history: {} },
+    (stored) => ({
+      picks: stored.picks ?? [],
+      reminders: stored.reminders ?? [],
+      history: stored.history ?? {},
+      // A new day starts with nothing ticked.
+      done: stored.day === today() ? (stored.done ?? []) : [],
+      day: today(),
+    }),
   );
-  const [done, setDone] = useState<string[]>(SEED_DEMO_ROUTINE ? [...SEED_DONE] : []);
-  const [reminders, setReminders] = useState<string[]>([]);
 
-  const add = useCallback((nutrientId: string) => {
-    setAdded((current) =>
-      current.includes(nutrientId) ? current : [...current, nutrientId],
-    );
-  }, []);
+  const { picks, done, reminders, history } = state;
+  const setDone = useCallback(
+    (fn: (prev: string[]) => string[]) =>
+      setState((s) => {
+        const next = fn(s.done);
+        const day = today();
+        // History is written here rather than in an effect, so it can never
+        // disagree with the ticks that produced it.
+        return { ...s, done: next, day, history: { ...s.history, [day]: next.length } };
+      }),
+    [setState],
+  );
+  const setReminders = useCallback(
+    (fn: (prev: string[]) => string[]) => setState((s) => ({ ...s, reminders: fn(s.reminders) })),
+    [setState],
+  );
 
-  const remove = useCallback((nutrientId: string) => {
-    setAdded((current) => current.filter((id) => id !== nutrientId));
-  }, []);
+  const add = useCallback(
+    (nutrientId: string) => {
+      const option = supplementOption(nutrientId);
+      if (!option) return;
+      setState((s) =>
+        s.picks.includes(option.id) ? s : { ...s, picks: [...s.picks, option.id] },
+      );
+    },
+    [setState],
+  );
+
+  const addOption = useCallback(
+    (optionId: string) =>
+      setState((s) =>
+        s.picks.includes(optionId) ? s : { ...s, picks: [...s.picks, optionId] },
+      ),
+    [setState],
+  );
+
+  const remove = useCallback(
+    (nutrientId: string) =>
+      setState((s) => {
+        const mine = (id: string) => id.startsWith(`${nutrientId}-`);
+        return {
+          ...s,
+          picks: s.picks.filter((id) => !mine(id)),
+          done: s.done.filter((id) => !mine(id)),
+          reminders: s.reminders.filter((id) => !mine(id)),
+        };
+      }),
+    [setState],
+  );
 
   const toggleReminder = useCallback((itemId: string) => {
     setReminders((current) =>
@@ -141,7 +209,7 @@ export function RoutineProvider({ children }: { children: ReactNode }) {
         ? current.filter((id) => id !== itemId)
         : [...current, itemId],
     );
-  }, []);
+  }, [setReminders]);
 
   const toggleDone = useCallback((itemId: string) => {
     setDone((current) =>
@@ -149,7 +217,7 @@ export function RoutineProvider({ children }: { children: ReactNode }) {
         ? current.filter((id) => id !== itemId)
         : [...current, itemId],
     );
-  }, []);
+  }, [setDone]);
 
   // The routine has to respect Q5 for the same reason Results does: adding
   // salmon to the daily list of someone who just told us "no fish" is the
@@ -157,47 +225,88 @@ export function RoutineProvider({ children }: { children: ReactNode }) {
   const { answers } = useQuiz();
   const restrictions = answers.restrictions;
 
-  const items = useMemo<RoutineItem[]>(
-    () =>
-      added.flatMap((nutrientId) =>
-        (EXPANSIONS[nutrientId] ?? [])
-          .filter(
-            (item) => !item.excludedBy?.some((id) => restrictions.includes(id)),
-          )
-          .map(({ excludedBy: _excludedBy, narrows, ...item }, i) => {
-            const narrowed = restrictions
-              .map((id) => narrows?.[id])
-              .find(Boolean);
-            return {
-              ...item,
-              title: narrowed ?? item.title,
-              nutrientId,
-              // Index is stable across restriction changes because filtering
-              // happens before mapping - ids stay tied to position in the
-              // surviving list, which is what `done` refers to.
-              id: `${nutrientId}-${i}`,
-            };
-          }),
-      ),
-    [added, restrictions],
+  const items = useMemo(() => resolveItems(picks, restrictions), [picks, restrictions]);
+
+  // Nutrients with anything in the routine. Derived, so it cannot disagree
+  // with the rows on screen.
+  const added = useMemo(() => nutrientsIn(items), [items]);
+
+  const removeItem = useCallback(
+    (itemId: string) =>
+      setState((s) => ({
+        ...s,
+        picks: s.picks.filter((id) => id !== itemId),
+        done: s.done.filter((id) => id !== itemId),
+        reminders: s.reminders.filter((id) => id !== itemId),
+      })),
+    [setState],
   );
 
-  const remindAll = useCallback(() => setReminders(items.map((i) => i.id)), [items]);
+  const remindAll = useCallback(
+    () => setReminders(() => items.map((i) => i.id)),
+    [items, setReminders],
+  );
+
+  /**
+   * Keep the OS schedule matching the toggles.
+   *
+   * Driven by the count of live reminders rather than by each toggle, so the
+   * schedule is correct after a restore from storage as well as after a tap —
+   * and so turning three bells on in a row does not schedule three times.
+   */
+  const [reminderStatus, setReminderStatus] = useState<ReminderStatus>('cleared');
+  const liveReminders = useMemo(
+    () => reminders.filter((id) => items.some((i) => i.id === id)).length,
+    [reminders, items],
+  );
+
+  useEffect(() => {
+    if (!hydrated) return;
+    let alive = true;
+    syncDailyReminder(liveReminders).then((status) => {
+      if (alive) setReminderStatus(status);
+    });
+    return () => {
+      alive = false;
+    };
+  }, [hydrated, liveReminders]);
 
   const value = useMemo(
     () => ({
+      hydrated,
       added,
+      picks,
       items,
       done,
       reminders,
       reminderTime: REMINDER_TIME,
+      reminderStatus,
+      history,
+      streak: streakFrom(history),
       add,
+      addOption,
       remove,
+      removeItem,
       toggleDone,
       toggleReminder,
       remindAll,
     }),
-    [added, items, done, reminders, add, remove, toggleDone, toggleReminder, remindAll],
+    [
+      hydrated,
+      added,
+      picks,
+      items,
+      done,
+      reminders,
+      reminderStatus,
+      history,
+      add,
+      remove,
+      removeItem,
+      toggleDone,
+      toggleReminder,
+      remindAll,
+    ],
   );
 
   return <RoutineContext.Provider value={value}>{children}</RoutineContext.Provider>;

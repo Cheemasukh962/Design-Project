@@ -66,7 +66,7 @@ export const Q2 = {
   options: [
     // Shortened from the mock's "Dairy or fortified alternatives", which
     // clamps to an ellipsis at this tile width. Meaning is preserved.
-    { id: 'dairy', label: 'Dairy / alternatives', icon: 'water-drop' },
+    { id: 'dairy', label: 'Dairy', icon: 'water-drop' },
     { id: 'eggs', label: 'Eggs', icon: 'egg' },
     { id: 'fish', label: 'Fish', icon: 'set-meal' },
     { id: 'meat', label: 'Meat', icon: 'restaurant' },

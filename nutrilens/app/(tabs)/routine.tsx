@@ -1,15 +1,16 @@
 import { useMemo, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
-import { ConsistencyMatrix } from '../../components/routine/ConsistencyMatrix';
 import { FilterPills, type RoutineFilter } from '../../components/routine/FilterPills';
 import { ProgressRing } from '../../components/routine/ProgressRing';
 import { RoutineItemRow } from '../../components/routine/RoutineItemRow';
+import { AddNutrientSheet } from '../../components/routine/AddNutrientSheet';
+import { CheckInPal } from '../../components/routine/CheckInPal';
 import { WeekCalendar } from '../../components/routine/WeekCalendar';
 import { Badge } from '../../components/ui/Badge';
 import { BrandBar } from '../../components/ui/BrandBar';
 import { Icon } from '../../components/ui/Icon';
 import { Screen } from '../../components/ui/Screen';
-import { ROUTINE_TIP, STREAK_DAYS, WEEK_COMPLETED } from '../../data/progress';
+import { ROUTINE_TIP } from '../../data/progress';
 import { useRoutine } from '../../data/RoutineContext';
 import { colors, radius, spacing, typography } from '../../theme';
 
@@ -41,10 +42,37 @@ function weekDates(today: Date): number[] {
   });
 }
 
+/** The seven Date objects of the current week, Monday first. */
+function weekDateObjects(today: Date): Date[] {
+  const monday = new Date(today);
+  monday.setDate(today.getDate() - mondayIndex(today.getDay()));
+  return Array.from({ length: 7 }, (_, i) => {
+    const d = new Date(monday);
+    d.setDate(monday.getDate() + i);
+    return d;
+  });
+}
+
+/** Local calendar day as YYYY-MM-DD, matching the keys the store writes. */
+function isoDay(d: Date): string {
+  return `${d.getFullYear()}-${`${d.getMonth() + 1}`.padStart(2, '0')}-${`${d.getDate()}`.padStart(2, '0')}`;
+}
+
 export default function RoutineRoute() {
-  const { items, done, toggleDone, reminders, reminderTime, toggleReminder, remindAll } =
-    useRoutine();
-  const [filter, setFilter] = useState<RoutineFilter>('all');
+  const {
+    items,
+    done,
+    toggleDone,
+    reminders,
+    reminderTime,
+    reminderStatus,
+    toggleReminder,
+    removeItem,
+    remindAll,
+    history,
+    streak,
+  } = useRoutine();
+  const [adding, setAdding] = useState(false);
 
   const today = useMemo(() => new Date(), []);
   const todayIndex = mondayIndex(today.getDay());
@@ -54,8 +82,17 @@ export default function RoutineRoute() {
     day: 'numeric',
   });
 
-  const visible = filter === 'all' ? items : items.filter((i) => i.type === filter);
   const doneCount = items.filter((i) => done.includes(i.id)).length;
+
+  // Which days of this week actually had something ticked. Was an invented
+  // constant; it is the stored history now, so an empty week looks empty.
+  const completedDays = useMemo(
+    () =>
+      weekDateObjects(today)
+        .map((d, i) => (history[isoDay(d)] > 0 ? i : -1))
+        .filter((i) => i >= 0),
+    [today, history],
+  );
   const remaining = items.length - doneCount;
   const allRemind = items.length > 0 && reminders.length === items.length;
 
@@ -67,11 +104,13 @@ export default function RoutineRoute() {
         {/* ---- Date and streak ---- */}
         <View style={styles.dateRow}>
           <Text style={styles.date}>Today, {dateLabel}</Text>
-          <Badge
-            tone="gold"
-            icon="local-fire-department"
-            label={`${STREAK_DAYS}-day streak`}
-          />
+          {streak > 0 && (
+            <Badge
+              tone="gold"
+              icon="local-fire-department"
+              label={`${streak}-day streak`}
+            />
+          )}
         </View>
         <Text style={styles.title} accessibilityRole="header">
           My Daily Routine
@@ -81,7 +120,7 @@ export default function RoutineRoute() {
           <WeekCalendar
             todayIndex={todayIndex}
             dates={dates}
-            completedDays={WEEK_COMPLETED}
+            completedDays={completedDays}
           />
         </View>
 
@@ -152,21 +191,32 @@ export default function RoutineRoute() {
                   : `${reminders.length} of ${items.length} have reminders`}
             </Text>
             <Text style={[styles.notifySub, allRemind && { color: colors.primaryFixed }]}>
-              {allRemind
-                ? 'Tap a bell on any item to turn that one off'
-                : `One nudge at ${reminderTime}, so you do not have to remember`}
+              {/* Says what actually happened. A bar that reads "all set" while
+                  nothing is scheduled teaches someone to stop watching for the
+                  thing themselves, which is the exact failure this control
+                  exists to prevent. */}
+              {reminderStatus === 'unsupported' && reminders.length > 0
+                ? 'Saved. Notifications only arrive on a phone, not in a browser.'
+                : reminderStatus === 'denied'
+                  ? 'Notifications are blocked. Turn them on in your phone settings.'
+                  : allRemind
+                    ? 'Tap a bell on any item to turn that one off'
+                    : `One nudge at ${reminderTime}, so you do not have to remember`}
             </Text>
           </View>
         </Pressable>
 
-        {/* ---- Checklist ---- */}
+        {/* The pal sits directly above the checklist, so the consequence of a
+            tick is visible from the thing you tapped. */}
         <View style={styles.block}>
-          <FilterPills value={filter} onChange={setFilter} total={items.length} />
+          <CheckInPal />
         </View>
 
+        {/* ---- Checklist ---- */}
+
         <View style={styles.list}>
-          {visible.length > 0 ? (
-            visible.map((item) => (
+          {items.length > 0 ? (
+            items.map((item) => (
               <RoutineItemRow
                 key={item.id}
                 item={item}
@@ -174,13 +224,13 @@ export default function RoutineRoute() {
                 onToggle={() => toggleDone(item.id)}
                 reminderOn={reminders.includes(item.id)}
                 onToggleReminder={() => toggleReminder(item.id)}
+                onRemove={() => removeItem(item.id)}
               />
             ))
           ) : (
             <Text style={styles.empty}>
-              {items.length === 0
-                ? 'Your routine is empty. Take the quiz and add what comes back.'
-                : 'Nothing in this category yet.'}
+              Nothing here yet. Add something below, or take the quiz and add
+              what comes back.
             </Text>
           )}
         </View>
@@ -188,30 +238,16 @@ export default function RoutineRoute() {
         <Pressable
           accessibilityRole="button"
           accessibilityLabel="Add item to daily routine"
+          onPress={() => setAdding(true)}
           style={({ pressed }) => [styles.addRow, pressed && styles.addPressed]}
         >
           <Icon name="add-circle" size={20} color={colors.primary} />
           <Text style={styles.addLabel}>Add item to daily routine</Text>
         </Pressable>
 
-        {/* ---- Weekly focus ---- */}
-        <View style={[styles.block, styles.weekCard]}>
-          <View style={styles.weekHead}>
-            <View style={styles.weekText}>
-              <Text style={styles.eyebrow}>This week&apos;s focus</Text>
-              <Text style={styles.weekTitle}>Bone &amp; immune strength</Text>
-              <Text style={styles.weekBody}>
-                {WEEK_COMPLETED.length}/7 days logged
-              </Text>
-            </View>
-            <View style={styles.shield}>
-              <Icon name="shield" size={20} color={colors.secondary} />
-            </View>
-          </View>
-
-          <ConsistencyMatrix todayIndex={todayIndex} completedDays={WEEK_COMPLETED} />
-        </View>
       </ScrollView>
+
+      <AddNutrientSheet visible={adding} onClose={() => setAdding(false)} />
     </Screen>
   );
 }
@@ -243,6 +279,8 @@ const styles = StyleSheet.create({
     padding: spacing.cardPaddingLg,
     borderRadius: radius.md,
     backgroundColor: colors.surfaceContainerLowest,
+    borderWidth: 1,
+    borderColor: colors.cardEdge,
     shadowColor: '#435f8b',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.06,
@@ -352,6 +390,8 @@ const styles = StyleSheet.create({
     padding: spacing.cardPaddingLg,
     borderRadius: radius.md,
     backgroundColor: colors.surfaceContainerLowest,
+    borderWidth: 1,
+    borderColor: colors.cardEdge,
     gap: spacing.base * 3,
     shadowColor: '#435f8b',
     shadowOffset: { width: 0, height: 4 },
